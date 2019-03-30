@@ -1,0 +1,409 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		455B990E211C115C00EB5A4B /* HeeeAVPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */; };
+		A7251FF32127C0C4009E770B /* H_保存.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEA2127C0C4009E770B /* H_保存.png */; };
+		A7251FF42127C0C4009E770B /* H_前后摄像头切换.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEB2127C0C4009E770B /* H_前后摄像头切换.png */; };
+		A7251FF52127C0C4009E770B /* H_闪光灯_自动.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEC2127C0C4009E770B /* H_闪光灯_自动.png */; };
+		A7251FF62127C0C4009E770B /* H_选择.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FED2127C0C4009E770B /* H_选择.png */; };
+		A7251FF72127C0C4009E770B /* H_闪光灯_开.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEE2127C0C4009E770B /* H_闪光灯_开.png */; };
+		A7251FF82127C0C4009E770B /* H_闪光灯_关.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEF2127C0C4009E770B /* H_闪光灯_关.png */; };
+		A7251FF92127C0C4009E770B /* H_取消_白.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FF02127C0C4009E770B /* H_取消_白.png */; };
+		A7251FFA2127C0C4009E770B /* H_关闭相机.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FF12127C0C4009E770B /* H_关闭相机.png */; };
+		A7251FFB2127C0C4009E770B /* H_取消_灰.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FF22127C0C4009E770B /* H_取消_灰.png */; };
+		A73BFED121F4551E009246A4 /* UIView+HeeeHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = A73BFECD21F4551D009246A4 /* UIView+HeeeHUD.m */; };
+		A73BFED221F4551E009246A4 /* UIView+HeeeToast.m in Sources */ = {isa = PBXBuildFile; fileRef = A73BFECE21F4551D009246A4 /* UIView+HeeeToast.m */; };
+		A73DF89A211B31B2000C2F70 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF899211B31B2000C2F70 /* AppDelegate.m */; };
+		A73DF89D211B31B2000C2F70 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF89C211B31B2000C2F70 /* ViewController.m */; };
+		A73DF8A2211B31B3000C2F70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A73DF8A1211B31B3000C2F70 /* Assets.xcassets */; };
+		A73DF8A8211B31B3000C2F70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8A7211B31B3000C2F70 /* main.m */; };
+		A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */; };
+		A73DF8D9211B4173000C2F70 /* HeeePictureTakerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */; };
+		A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		455B990C211C115C00EB5A4B /* HeeeAVPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeeeAVPlayerViewController.h; sourceTree = "<group>"; };
+		455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeeeAVPlayerViewController.m; sourceTree = "<group>"; };
+		A7251FEA2127C0C4009E770B /* H_保存.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_保存.png"; sourceTree = "<group>"; };
+		A7251FEB2127C0C4009E770B /* H_前后摄像头切换.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_前后摄像头切换.png"; sourceTree = "<group>"; };
+		A7251FEC2127C0C4009E770B /* H_闪光灯_自动.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_闪光灯_自动.png"; sourceTree = "<group>"; };
+		A7251FED2127C0C4009E770B /* H_选择.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_选择.png"; sourceTree = "<group>"; };
+		A7251FEE2127C0C4009E770B /* H_闪光灯_开.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_闪光灯_开.png"; sourceTree = "<group>"; };
+		A7251FEF2127C0C4009E770B /* H_闪光灯_关.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_闪光灯_关.png"; sourceTree = "<group>"; };
+		A7251FF02127C0C4009E770B /* H_取消_白.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_取消_白.png"; sourceTree = "<group>"; };
+		A7251FF12127C0C4009E770B /* H_关闭相机.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_关闭相机.png"; sourceTree = "<group>"; };
+		A7251FF22127C0C4009E770B /* H_取消_灰.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_取消_灰.png"; sourceTree = "<group>"; };
+		A73BFECD21F4551D009246A4 /* UIView+HeeeHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeHUD.m"; sourceTree = "<group>"; };
+		A73BFECE21F4551D009246A4 /* UIView+HeeeToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeToast.m"; sourceTree = "<group>"; };
+		A73BFECF21F4551D009246A4 /* UIView+HeeeHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeHUD.h"; sourceTree = "<group>"; };
+		A73BFED021F4551E009246A4 /* UIView+HeeeToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeToast.h"; sourceTree = "<group>"; };
+		A73DF895211B31B2000C2F70 /* PictureTaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PictureTaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A73DF898211B31B2000C2F70 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		A73DF899211B31B2000C2F70 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		A73DF89B211B31B2000C2F70 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		A73DF89C211B31B2000C2F70 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		A73DF8A1211B31B3000C2F70 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A73DF8A6211B31B3000C2F70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A73DF8A7211B31B3000C2F70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerAnimateButton.h; sourceTree = "<group>"; };
+		A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeQuickFrame.m"; sourceTree = "<group>"; };
+		A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerViewController.m; sourceTree = "<group>"; };
+		A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerAnimateButton.m; sourceTree = "<group>"; };
+		A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeQuickFrame.h"; sourceTree = "<group>"; };
+		A73DF8D2211B4173000C2F70 /* HeeePictureTakerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerViewController.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A73DF892211B31B2000C2F70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A7251FE92127C0C4009E770B /* res */ = {
+			isa = PBXGroup;
+			children = (
+				A7251FEA2127C0C4009E770B /* H_保存.png */,
+				A7251FEB2127C0C4009E770B /* H_前后摄像头切换.png */,
+				A7251FEC2127C0C4009E770B /* H_闪光灯_自动.png */,
+				A7251FED2127C0C4009E770B /* H_选择.png */,
+				A7251FEE2127C0C4009E770B /* H_闪光灯_开.png */,
+				A7251FEF2127C0C4009E770B /* H_闪光灯_关.png */,
+				A7251FF02127C0C4009E770B /* H_取消_白.png */,
+				A7251FF12127C0C4009E770B /* H_关闭相机.png */,
+				A7251FF22127C0C4009E770B /* H_取消_灰.png */,
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
+		A73DF88C211B31B1000C2F70 = {
+			isa = PBXGroup;
+			children = (
+				A73DF897211B31B2000C2F70 /* PictureTaker */,
+				A73DF896211B31B2000C2F70 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A73DF896211B31B2000C2F70 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A73DF895211B31B2000C2F70 /* PictureTaker.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A73DF897211B31B2000C2F70 /* PictureTaker */ = {
+			isa = PBXGroup;
+			children = (
+				A73DF898211B31B2000C2F70 /* AppDelegate.h */,
+				A73DF899211B31B2000C2F70 /* AppDelegate.m */,
+				A73DF89B211B31B2000C2F70 /* ViewController.h */,
+				A73DF89C211B31B2000C2F70 /* ViewController.m */,
+				A73DF8C7211B4173000C2F70 /* HeeePictureTakerViewController */,
+				A73DF8A1211B31B3000C2F70 /* Assets.xcassets */,
+				A73DF8A6211B31B3000C2F70 /* Info.plist */,
+				A73DF8A7211B31B3000C2F70 /* main.m */,
+			);
+			path = PictureTaker;
+			sourceTree = "<group>";
+		};
+		A73DF8C7211B4173000C2F70 /* HeeePictureTakerViewController */ = {
+			isa = PBXGroup;
+			children = (
+				A73DF8D2211B4173000C2F70 /* HeeePictureTakerViewController.h */,
+				A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */,
+				455B990C211C115C00EB5A4B /* HeeeAVPlayerViewController.h */,
+				455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */,
+				A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */,
+				A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */,
+				A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */,
+				A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */,
+				A73BFECF21F4551D009246A4 /* UIView+HeeeHUD.h */,
+				A73BFECD21F4551D009246A4 /* UIView+HeeeHUD.m */,
+				A73BFED021F4551E009246A4 /* UIView+HeeeToast.h */,
+				A73BFECE21F4551D009246A4 /* UIView+HeeeToast.m */,
+				A7251FE92127C0C4009E770B /* res */,
+			);
+			path = HeeePictureTakerViewController;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A73DF894211B31B2000C2F70 /* PictureTaker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A73DF8AB211B31B3000C2F70 /* Build configuration list for PBXNativeTarget "PictureTaker" */;
+			buildPhases = (
+				A73DF891211B31B2000C2F70 /* Sources */,
+				A73DF892211B31B2000C2F70 /* Frameworks */,
+				A73DF893211B31B2000C2F70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PictureTaker;
+			productName = PictureTaker;
+			productReference = A73DF895211B31B2000C2F70 /* PictureTaker.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A73DF88D211B31B1000C2F70 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = hgy;
+				TargetAttributes = {
+					A73DF894211B31B2000C2F70 = {
+						CreatedOnToolsVersion = 9.4;
+					};
+				};
+			};
+			buildConfigurationList = A73DF890211B31B1000C2F70 /* Build configuration list for PBXProject "PictureTaker" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A73DF88C211B31B1000C2F70;
+			productRefGroup = A73DF896211B31B2000C2F70 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A73DF894211B31B2000C2F70 /* PictureTaker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A73DF893211B31B2000C2F70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7251FF82127C0C4009E770B /* H_闪光灯_关.png in Resources */,
+				A7251FF42127C0C4009E770B /* H_前后摄像头切换.png in Resources */,
+				A7251FFA2127C0C4009E770B /* H_关闭相机.png in Resources */,
+				A7251FF52127C0C4009E770B /* H_闪光灯_自动.png in Resources */,
+				A7251FF62127C0C4009E770B /* H_选择.png in Resources */,
+				A73DF8A2211B31B3000C2F70 /* Assets.xcassets in Resources */,
+				A7251FF72127C0C4009E770B /* H_闪光灯_开.png in Resources */,
+				A7251FFB2127C0C4009E770B /* H_取消_灰.png in Resources */,
+				A7251FF92127C0C4009E770B /* H_取消_白.png in Resources */,
+				A7251FF32127C0C4009E770B /* H_保存.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A73DF891211B31B2000C2F70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A73DF89D211B31B2000C2F70 /* ViewController.m in Sources */,
+				A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */,
+				A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */,
+				455B990E211C115C00EB5A4B /* HeeeAVPlayerViewController.m in Sources */,
+				A73DF8D9211B4173000C2F70 /* HeeePictureTakerViewController.m in Sources */,
+				A73DF8A8211B31B3000C2F70 /* main.m in Sources */,
+				A73BFED221F4551E009246A4 /* UIView+HeeeToast.m in Sources */,
+				A73DF89A211B31B2000C2F70 /* AppDelegate.m in Sources */,
+				A73BFED121F4551E009246A4 /* UIView+HeeeHUD.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A73DF8A9211B31B3000C2F70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		A73DF8AA211B31B3000C2F70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A73DF8AC211B31B3000C2F70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 27HH8LNC45;
+				INFOPLIST_FILE = PictureTaker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.ceshi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A73DF8AD211B31B3000C2F70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 27HH8LNC45;
+				INFOPLIST_FILE = PictureTaker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.ceshi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A73DF890211B31B1000C2F70 /* Build configuration list for PBXProject "PictureTaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A73DF8A9211B31B3000C2F70 /* Debug */,
+				A73DF8AA211B31B3000C2F70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A73DF8AB211B31B3000C2F70 /* Build configuration list for PBXNativeTarget "PictureTaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A73DF8AC211B31B3000C2F70 /* Debug */,
+				A73DF8AD211B31B3000C2F70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A73DF88D211B31B1000C2F70 /* Project object */;
+}
