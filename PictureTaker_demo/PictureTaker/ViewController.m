@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "HeeePictureTakerViewController.h"
+#import "HeeePictureTakerController.h"
 #import "UIView+HeeeToast.h"
 @interface ViewController ()
 
@@ -34,18 +34,18 @@
 }
 
 - (void)pictureBtnClick {
-    HeeePictureTakerViewController *pictureTakerVC = [[HeeePictureTakerViewController alloc] initWithTakerMode:TakerModePicture];
+    HeeePictureTakerController *pictureTakerVC = [[HeeePictureTakerController alloc] initWithTakerMode:HeeeTakerModePicture];
     [self presentViewController:pictureTakerVC animated:YES completion:nil];
 }
 
 - (void)videoBtnClick {
-    HeeePictureTakerViewController *pictureTakerVC = [[HeeePictureTakerViewController alloc] initWithTakerMode:TakerModeVideo];
+    HeeePictureTakerController *pictureTakerVC = [[HeeePictureTakerController alloc] initWithTakerMode:HeeeTakerModeVideo];
     [self presentViewController:pictureTakerVC animated:YES completion:nil];
 }
 
 //点击拍照，长按拍视频
 - (void)pictureAndVideoBtnClick {
-    HeeePictureTakerViewController *pictureTakerVC = [[HeeePictureTakerViewController alloc] initWithTakerMode:TakerModePictureAndVideo];
+    HeeePictureTakerController *pictureTakerVC = [[HeeePictureTakerController alloc] initWithTakerMode:HeeeTakerModePictureAndVideo];
     [self presentViewController:pictureTakerVC animated:YES completion:nil];
 }
 

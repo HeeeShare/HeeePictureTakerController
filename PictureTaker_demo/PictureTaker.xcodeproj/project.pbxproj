@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		455B990E211C115C00EB5A4B /* HeeeAVPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */; };
+		455B990E211C115C00EB5A4B /* HeeeAVPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 455B990D211C115C00EB5A4B /* HeeeAVPlayerController.m */; };
 		A7251FF32127C0C4009E770B /* H_保存.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEA2127C0C4009E770B /* H_保存.png */; };
 		A7251FF42127C0C4009E770B /* H_前后摄像头切换.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEB2127C0C4009E770B /* H_前后摄像头切换.png */; };
 		A7251FF52127C0C4009E770B /* H_闪光灯_自动.png in Resources */ = {isa = PBXBuildFile; fileRef = A7251FEC2127C0C4009E770B /* H_闪光灯_自动.png */; };
@@ -24,13 +24,13 @@
 		A73DF8A2211B31B3000C2F70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A73DF8A1211B31B3000C2F70 /* Assets.xcassets */; };
 		A73DF8A8211B31B3000C2F70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8A7211B31B3000C2F70 /* main.m */; };
 		A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */; };
-		A73DF8D9211B4173000C2F70 /* HeeePictureTakerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */; };
+		A73DF8D9211B4173000C2F70 /* HeeePictureTakerController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CD211B4173000C2F70 /* HeeePictureTakerController.m */; };
 		A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		455B990C211C115C00EB5A4B /* HeeeAVPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeeeAVPlayerViewController.h; sourceTree = "<group>"; };
-		455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeeeAVPlayerViewController.m; sourceTree = "<group>"; };
+		455B990C211C115C00EB5A4B /* HeeeAVPlayerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeeeAVPlayerController.h; sourceTree = "<group>"; };
+		455B990D211C115C00EB5A4B /* HeeeAVPlayerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeeeAVPlayerController.m; sourceTree = "<group>"; };
 		A7251FEA2127C0C4009E770B /* H_保存.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_保存.png"; sourceTree = "<group>"; };
 		A7251FEB2127C0C4009E770B /* H_前后摄像头切换.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_前后摄像头切换.png"; sourceTree = "<group>"; };
 		A7251FEC2127C0C4009E770B /* H_闪光灯_自动.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "H_闪光灯_自动.png"; sourceTree = "<group>"; };
@@ -54,10 +54,10 @@
 		A73DF8A7211B31B3000C2F70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerAnimateButton.h; sourceTree = "<group>"; };
 		A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeQuickFrame.m"; sourceTree = "<group>"; };
-		A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerViewController.m; sourceTree = "<group>"; };
+		A73DF8CD211B4173000C2F70 /* HeeePictureTakerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerController.m; sourceTree = "<group>"; };
 		A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerAnimateButton.m; sourceTree = "<group>"; };
 		A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeQuickFrame.h"; sourceTree = "<group>"; };
-		A73DF8D2211B4173000C2F70 /* HeeePictureTakerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerViewController.h; sourceTree = "<group>"; };
+		A73DF8D2211B4173000C2F70 /* HeeePictureTakerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,7 +110,7 @@
 				A73DF899211B31B2000C2F70 /* AppDelegate.m */,
 				A73DF89B211B31B2000C2F70 /* ViewController.h */,
 				A73DF89C211B31B2000C2F70 /* ViewController.m */,
-				A73DF8C7211B4173000C2F70 /* HeeePictureTakerViewController */,
+				A73DF8C7211B4173000C2F70 /* HeeePictureTakerController */,
 				A73DF8A1211B31B3000C2F70 /* Assets.xcassets */,
 				A73DF8A6211B31B3000C2F70 /* Info.plist */,
 				A73DF8A7211B31B3000C2F70 /* main.m */,
@@ -118,13 +118,13 @@
 			path = PictureTaker;
 			sourceTree = "<group>";
 		};
-		A73DF8C7211B4173000C2F70 /* HeeePictureTakerViewController */ = {
+		A73DF8C7211B4173000C2F70 /* HeeePictureTakerController */ = {
 			isa = PBXGroup;
 			children = (
-				A73DF8D2211B4173000C2F70 /* HeeePictureTakerViewController.h */,
-				A73DF8CD211B4173000C2F70 /* HeeePictureTakerViewController.m */,
-				455B990C211C115C00EB5A4B /* HeeeAVPlayerViewController.h */,
-				455B990D211C115C00EB5A4B /* HeeeAVPlayerViewController.m */,
+				A73DF8D2211B4173000C2F70 /* HeeePictureTakerController.h */,
+				A73DF8CD211B4173000C2F70 /* HeeePictureTakerController.m */,
+				455B990C211C115C00EB5A4B /* HeeeAVPlayerController.h */,
+				455B990D211C115C00EB5A4B /* HeeeAVPlayerController.m */,
 				A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */,
 				A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */,
 				A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */,
@@ -135,7 +135,7 @@
 				A73BFECE21F4551D009246A4 /* UIView+HeeeToast.m */,
 				A7251FE92127C0C4009E770B /* res */,
 			);
-			path = HeeePictureTakerViewController;
+			path = HeeePictureTakerController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,8 +218,8 @@
 				A73DF89D211B31B2000C2F70 /* ViewController.m in Sources */,
 				A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */,
 				A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */,
-				455B990E211C115C00EB5A4B /* HeeeAVPlayerViewController.m in Sources */,
-				A73DF8D9211B4173000C2F70 /* HeeePictureTakerViewController.m in Sources */,
+				455B990E211C115C00EB5A4B /* HeeeAVPlayerController.m in Sources */,
+				A73DF8D9211B4173000C2F70 /* HeeePictureTakerController.m in Sources */,
 				A73DF8A8211B31B3000C2F70 /* main.m in Sources */,
 				A73BFED221F4551E009246A4 /* UIView+HeeeToast.m in Sources */,
 				A73DF89A211B31B2000C2F70 /* AppDelegate.m in Sources */,
@@ -354,7 +354,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.ceshi;
+				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.cessssss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -375,7 +375,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.ceshi;
+				PRODUCT_BUNDLE_IDENTIFIER = www.Heee.cessssss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

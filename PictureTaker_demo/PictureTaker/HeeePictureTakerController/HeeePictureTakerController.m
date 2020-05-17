@@ -1,27 +1,27 @@
 //
-//  HeeePictureTakerViewController.m
+//  HeeePictureTakerController.m
 //  PictureTaker
 //
 //  Created by hgy on 2018/8/8.
 //  Copyright © 2018年 hgy. All rights reserved.
 //
 
-#import "HeeePictureTakerViewController.h"
+#import "HeeePictureTakerController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
 #import "HeeePictureTakerAnimateButton.h"
-#import "HeeeAVPlayerViewController.h"
+#import "HeeeAVPlayerController.h"
 #import "UIView+HeeeQuickFrame.h"
 #import "UIView+HeeeHUD.h"
 #import "UIView+HeeeToast.h"
 
-typedef NS_ENUM(NSInteger,flashMode) {
-    FlashModeAuto,
-    FlashModeOn,
-    FlashModeOff,
+typedef NS_ENUM(NSInteger,HPFlashMode) {
+    HPFlashModeAuto,
+    HPFlashModeOn,
+    HPFlashModeOff,
 };
 
-@interface HeeePictureTakerViewController ()<CAAnimationDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface HeeePictureTakerController ()<CAAnimationDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
 /*相机配置*/
 @property (nonatomic, strong) AVCaptureDevice               *videoDevice;
 @property (nonatomic, strong) AVCaptureSession              *session;
@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
 @property (nonatomic, strong) UITapGestureRecognizer        *focusGesture;//对焦手势
 @property (nonatomic, strong) UIPinchGestureRecognizer      *pinchGesture;//缩放手势
 @property (nonatomic, strong) NSTimer                       *focusViewTimer1,*focusViewTimer2,*flashNoticeLabelTimer,*recodeTimer;//控制控件显示的timer
-@property (nonatomic, assign) flashMode                     flashMode;//0:自动，1:打开，2:关闭
+@property (nonatomic, assign) HPFlashMode                     flashMode;//0:自动，1:打开，2:关闭
 @property (nonatomic, assign) CGFloat                       initialPinchZoom;
 @property (nonatomic, assign) BOOL                          pictureMode;//没有在录视频的标志
 @property (nonatomic, assign) int                           recodeTime;
@@ -77,7 +77,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
 
 @end
 
-@implementation HeeePictureTakerViewController
+@implementation HeeePictureTakerController
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -98,7 +98,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
         [_session stopRunning];
     }
     
-    if (_takerMode != TakerModeVideo) {
+    if (_takerMode != HeeeTakerModeVideo) {
         _pictureMode = YES;
     }
     
@@ -114,10 +114,11 @@ typedef NS_ENUM(NSInteger,flashMode) {
     }];
 }
 
-- (instancetype)initWithTakerMode:(PictureTakerMode)takerMode {
+- (instancetype)initWithTakerMode:(HeeePictureTakerMode)takerMode {
     self = [super init];
     if (self) {
         _takerMode = takerMode;
+        self.modalPresentationStyle = UIModalPresentationFullScreen;
     }
     
     return self;
@@ -135,7 +136,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
     self.temAudioUrl = [[NSURL alloc] initFileURLWithPath:[self getVideoFolderWithName:@"temAudio.m4a"]];
     _outputSize = CGSizeMake(1080, 1920);
     
-    if (_takerMode != TakerModeVideo) {
+    if (_takerMode != HeeeTakerModeVideo) {
         _pictureMode = YES;
     }
     
@@ -150,6 +151,22 @@ typedef NS_ENUM(NSInteger,flashMode) {
         [self configCamera];
         [self addSubViews];
     }
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    _screenWidth = self.view.bounds.size.width;
+    _screenHeight = self.view.bounds.size.height;
+    _gestureView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
+    _maskView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
+    _pictureShowIV.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
+    self.retakeBackView.heee_bottom = _screenHeight - 80;
+    self.saveBackView.heee_bottom = self.retakeBackView.heee_top - 10;
+    self.selectBackView.heee_bottom = self.saveBackView.heee_top - 10;
+    self.previewLayer.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
+    self.shutterButton.heee_centerX = _screenWidth/2;
+    self.shutterButton.heee_bottom = _screenHeight - 34;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -241,7 +258,13 @@ typedef NS_ENUM(NSInteger,flashMode) {
     
     _switchCameraButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
     [_switchCameraButton addTarget:self action:@selector(switchCameraButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
-    _switchCameraButton.heee_top = 10;
+    
+    if (@available(iOS 11.0, *)) {
+        _switchCameraButton.heee_top = [UIApplication sharedApplication].keyWindow.safeAreaInsets.top;
+    }else{
+        _switchCameraButton.heee_top = 10;
+    }
+    
     _switchCameraButton.heee_right = _screenWidth - 10;
     [_switchCameraButton setImage:[UIImage imageNamed:@"H_前后摄像头切换.png"] forState:(UIControlStateNormal)];
     [_switchCameraButton setImageEdgeInsets:UIEdgeInsetsMake(1, 0, 1, 0)];
@@ -301,6 +324,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
     _pictureShowIV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
     _pictureShowIV.userInteractionEnabled = YES;
     _pictureShowIV.hidden = YES;
+    _pictureShowIV.contentMode = UIViewContentModeScaleAspectFill;
     [self.view addSubview:_pictureShowIV];
     
     [self.view addSubview:self.retakeBackView];
@@ -319,8 +343,7 @@ typedef NS_ENUM(NSInteger,flashMode) {
     [_gestureView addGestureRecognizer:_pinchGesture];
 }
 
-- (void)configCamera
-{
+- (void)configCamera {
     //使用AVMediaTypeVideo 指明self.device代表视频，默认使用后置摄像头进行初始化
     self.videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     
@@ -335,12 +358,12 @@ typedef NS_ENUM(NSInteger,flashMode) {
     }
     
     //添加视频输入
-    self.videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:self.videoDevice error:nil];
+    self.videoInput = [AVCaptureDeviceInput deviceInputWithDevice:[self cameraWithPosition:AVCaptureDevicePositionBack] error:nil];
     if ([self.session canAddInput:self.videoInput]) {
         [self.session addInput:self.videoInput];
     }
     
-    if (_takerMode != TakerModePicture) {
+    if (_takerMode != HeeeTakerModePicture) {
         //添加语音输入
         AVCaptureDevice *audioCaptureDevice = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] firstObject];
         self.audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioCaptureDevice error:nil];
@@ -394,11 +417,792 @@ typedef NS_ENUM(NSInteger,flashMode) {
     }
 }
 
+#pragma mark - action
+//检测相机权限
+- (BOOL)checkCameraPermission {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusDenied) {
+        return NO;
+    }else{
+        return YES;
+    }
+    return YES;
+}
+
+//设置写入属性
+- (void)setUpWriter {
+    //视频
+    self.videoAssetWriter = [AVAssetWriter assetWriterWithURL:self.temVideoUrl fileType:AVFileTypeMPEG4 error:nil];
+    
+    NSDictionary *videoCompressionSettings = @{AVVideoCodecKey : AVVideoCodecH264,
+                                               AVVideoWidthKey : @(self.outputSize.height),
+                                               AVVideoHeightKey : @(self.outputSize.width), AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill};
+    _assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoCompressionSettings];
+    //expectsMediaDataInRealTime 必须设为yes，需要从capture session 实时获取数据
+    _assetWriterVideoInput.expectsMediaDataInRealTime = YES;
+    _assetWriterVideoInput.transform = CGAffineTransformMakeRotation(M_PI / 2.0);
+    
+    if ([_videoAssetWriter canAddInput:_assetWriterVideoInput]) {
+        [_videoAssetWriter addInput:_assetWriterVideoInput];
+    }
+    
+    //音频
+    self.audioAssetWriter = [AVAssetWriter assetWriterWithURL:self.temAudioUrl fileType:AVFileTypeAppleM4A error:nil];
+    
+    NSDictionary *audioCompressionSettings = @{AVFormatIDKey:@(kAudioFormatMPEG4AAC),
+                                               AVEncoderBitRateKey:@(128000),
+                                               AVSampleRateKey:@(44100),
+                                               AVNumberOfChannelsKey:@(1)};
+    
+    self.assetWriterAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:audioCompressionSettings];
+    self.assetWriterAudioInput.expectsMediaDataInRealTime = YES;
+    if ([self.audioAssetWriter canAddInput:self.assetWriterAudioInput]) {
+        [self.audioAssetWriter addInput:self.assetWriterAudioInput];
+    }
+    
+    _pictureMode = NO;
+    _isRecoding = YES;
+}
+
+- (void)destroyWrite {
+    self.videoAssetWriter = nil;
+    self.assetWriterAudioInput = nil;
+    self.assetWriterAudioInput = nil;
+    self.assetWriterVideoInput = nil;
+}
+
+//存放视频的文件夹
+- (NSString *)getVideoFolderWithName:(NSString *)name {
+    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *direc = [cacheDir stringByAppendingPathComponent:@"videoFolder"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:direc]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:direc withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    direc = [direc stringByAppendingPathComponent:name];
+    return direc;
+}
+
+- (void)pinchGesture:(UIPinchGestureRecognizer*)sender {
+    if (!_videoDevice)
+        return;
+    
+    if (sender.state == UIGestureRecognizerStateBegan)
+    {
+        _initialPinchZoom = _videoDevice.videoZoomFactor;
+    }
+    
+    if ([_videoDevice lockForConfiguration:nil]) {
+        CGFloat zoomFactor;
+        zoomFactor =  _initialPinchZoom*pow(sender.scale < 1.0?8:2, (sender.scale - 1.0f));
+        zoomFactor = MIN(5.0, zoomFactor);
+        zoomFactor = MAX(1.0, zoomFactor);
+        _videoDevice.videoZoomFactor = zoomFactor;
+        [_videoDevice unlockForConfiguration];
+    }
+}
+
+- (void)focusGesture:(UITapGestureRecognizer*)gesture {
+    CGPoint point = [gesture locationInView:gesture.view];
+    [self focusAtPoint:point];
+}
+
+- (void)focusAtPoint:(CGPoint)point {
+    CGSize size = self.view.bounds.size;
+    CGPoint focusPoint = CGPointMake( point.y /size.height ,1 - point.x/size.width );
+    
+    if ([self.videoDevice lockForConfiguration:nil]) {
+        [self.videoDevice setFocusPointOfInterest:focusPoint];
+        
+        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure ]) {
+            [self.videoDevice setExposurePointOfInterest:focusPoint];
+            //曝光量调节
+            [self.videoDevice setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
+        }
+        
+        [self.videoDevice unlockForConfiguration];
+    }
+    
+    [self clearFocusTimer];
+    
+    self.focusView.transform = CGAffineTransformIdentity;
+    self.focusView.center = point;
+    self.focusView.alpha = 1;
+    
+    //对焦框缩放动画
+    CABasicAnimation *anima = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    anima.fillMode = kCAFillModeForwards;
+    anima.removedOnCompletion = NO;
+    anima.fromValue = [NSNumber numberWithFloat:1.0f];
+    anima.toValue = [NSNumber numberWithFloat:0.6f];
+    anima.duration = 0.25;
+    anima.delegate = self;
+    [self.focusView.layer addAnimation:anima forKey:@"focusViewAnimate"];
+}
+
+- (void)handleFlashNoticeLabel {
+    if (_flashNoticeLabelTimer) {
+        [_flashNoticeLabelTimer invalidate];
+        _flashNoticeLabelTimer = nil;
+    }
+    
+    self.flashNoticeLabel.alpha = 0;
+    
+    if (_flashMode == HPFlashModeAuto) {
+        self.flashNoticeLabel.text = @"闪光灯-自动";
+    }else if (_flashMode == HPFlashModeOn) {
+        self.flashNoticeLabel.text = @"闪光灯-开";
+    }else{
+        self.flashNoticeLabel.text = @"闪光灯-关";
+    }
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        self.flashNoticeLabel.alpha = 1;
+    }];
+    
+    _flashNoticeLabelTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(flashNoticeLabelTimerAction) userInfo:nil repeats:NO];
+}
+
+- (void)focusViewTimer1Action {
+    [UIView animateWithDuration:0.25 animations:^{
+        self.focusView.alpha = 0.3;
+    }];
+}
+
+- (void)focusViewTimer2Action {
+    [UIView animateWithDuration:0.25 animations:^{
+        self.focusView.alpha = 0;
+    }];
+    [self clearFocusTimer];
+}
+
+- (void)flashNoticeLabelTimerAction  {
+    [UIView animateWithDuration:0.25 animations:^{
+        self.flashNoticeLabel.alpha = 0;
+    }];
+}
+
+- (void)refreshRecodeTime {
+    _recodeTime++;
+    
+    if (_recodeTime < 60) {
+        _recodeTimeLabel.text = [NSString stringWithFormat:@"00:%02d",_recodeTime];
+    }else if (_recodeTime < 60*60) {
+        _recodeTimeLabel.text = [NSString stringWithFormat:@"%02d:%02d",_recodeTime/60,_recodeTime%60];
+    }else{
+        //最多录制1个小时
+        [self stopWrite];
+    }
+}
+
+- (void)clearFocusTimer {
+    if (_focusViewTimer1) {
+        [_focusViewTimer1 invalidate];
+        _focusViewTimer1 = nil;
+    }
+    
+    if (_focusViewTimer2) {
+        [_focusViewTimer2 invalidate];
+        _focusViewTimer2 = nil;
+    }
+    
+    [self.focusView.layer removeAllAnimations];
+    self.focusView.alpha = 0;
+}
+
+- (void)reset {
+    [self.view hideHUD];
+    _focusGesture.enabled = YES;
+    _pinchGesture.enabled = YES;
+    _recodeTimeLabel.text = @"00:00";
+    _recodeTimeBackView.alpha = 0;
+     _flashNoticeLabel.alpha = 0;
+    [_shutterButton reset];
+    _isRecoding = NO;
+    _recodeTime = 0;
+    [self clearFocusTimer];
+    
+    if (_videoDevice.isTorchActive) {
+        if ([_videoDevice lockForConfiguration:nil]) {
+            [_videoDevice setTorchMode:AVCaptureTorchModeOff];
+            [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
+            [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
+            [_videoDevice unlockForConfiguration];
+        }
+        
+        _flashMode = HPFlashModeAuto;
+    }
+    
+    if (_recodeTimer) {
+        [_recodeTimer invalidate];
+        _recodeTimer = nil;
+    }
+    
+    [self destroyWrite];
+}
+
+- (void)clearPicture {
+    self.retakeBackView.hidden = YES;
+    self.selectBackView.hidden = YES;
+    self.saveBackView.hidden = YES;
+    _pictureShowIV.image = nil;
+    _pictureShowIV.hidden = YES;
+}
+
+- (void)retakePicture {
+    [self reset];
+    [self clearPicture];
+}
+
+- (void)selectPicture {
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSelectImage:)]) {
+        [_delegate pictureViewController:self didSelectImage:_image];
+    }
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+//保存照片到手机相册
+- (void)saveToAlbum {
+    UIImageWriteToSavedPhotosAlbum(_image, self, @selector(image:didFinishSavingWithError:contextInfo:), (__bridge void *)self);
+}
+
+//照片保存成功
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self.view showToast:@"保存照片成功" duration:1.5 andPosition:@"center"];
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveImage:error:)]) {
+        [_delegate pictureViewController:self didSaveImage:image error:error];
+    }
+}
+
+- (void)shutterButtonClick {
+    if (_takerMode == HeeeTakerModeVideo) {
+        if (_isRecoding) {
+            [UIView animateWithDuration:0.25 animations:^{
+                self.recodeTimeBackView.alpha = 0;
+            } completion:^(BOOL finished) {
+                self.recodeTimeLabel.text = @"00:00";
+            }];
+            
+            [self stopWrite];
+            
+            if (self.recodeTimer) {
+                [self.recodeTimer invalidate];
+                self.recodeTimer = nil;
+            }
+            
+            self.recodeTime = 0;
+        }else{
+            [UIView animateWithDuration:0.25 animations:^{
+                self.recodeTimeBackView.alpha = 1.0;
+            }];
+            
+            [self configTorchMode];
+            
+            [self startWrite];
+            
+            if (self.recodeTimer == nil) {
+                self.recodeTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(refreshRecodeTime) userInfo:nil repeats:YES];
+            }
+        }
+    }else if (_pictureMode) {
+        [self.view hideHUD];
+        
+        _pictureShowIV.hidden = NO;
+        _focusGesture.enabled = NO;
+        _pinchGesture.enabled = NO;
+        
+        AVCaptureConnection *videoConnection = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
+        if (videoConnection ==  nil) {
+            _pictureShowIV.hidden = YES;
+            _focusGesture.enabled = YES;
+            _pinchGesture.enabled = YES;
+            return;
+        }
+        
+        //前置摄像头时，设置镜像图片
+        AVCaptureDevicePosition position = [[self.videoInput device] position];
+        if (position == AVCaptureDevicePositionFront) {
+            videoConnection.videoMirrored = YES;
+        }
+        
+        __weak typeof (self) weakSelf = self;
+        [self.imageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+            if (imageDataSampleBuffer == nil) {
+                weakSelf.pictureShowIV.hidden = YES;
+                weakSelf.focusGesture.enabled = YES;
+                weakSelf.pinchGesture.enabled = YES;
+                return;
+            }
+            
+            NSData *imageData =  [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+            weakSelf.image = [UIImage imageWithData:imageData];
+            weakSelf.pictureShowIV.image = weakSelf.image;
+            weakSelf.retakeBackView.hidden = weakSelf.pictureShowIV.hidden;
+            weakSelf.selectBackView.hidden = weakSelf.pictureShowIV.hidden;
+            weakSelf.saveBackView.hidden = weakSelf.pictureShowIV.hidden;
+        }];
+    }
+}
+
+- (void)startWrite {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.temVideoUrl path]]) {
+        [[NSFileManager defaultManager] removeItemAtPath:[self.temVideoUrl path] error:nil];
+    }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.temAudioUrl path]]) {
+        [[NSFileManager defaultManager] removeItemAtPath:[self.temAudioUrl path] error:nil];
+    }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.videoUrl path]]) {
+        [[NSFileManager defaultManager] removeItemAtPath:[self.videoUrl path] error:nil];
+    }
+    
+    [self setUpWriter];
+}
+
+- (void)stopWrite {
+    [self.view showHUDWithTitle:nil];
+    
+    if (_takerMode == HeeeTakerModePictureAndVideo) {
+        //这种情况录视频，最好把shutterButton移除再加上，否则会走shutterButtonClick，造成不必要的问题。
+        [self.shutterButton removeFromSuperview];
+        self.shutterButton.userInteractionEnabled = NO;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            self.shutterButton.userInteractionEnabled = YES;
+        });
+        [self.view insertSubview:self.shutterButton belowSubview:_pictureShowIV];
+    }
+    
+    _isRecoding = NO;
+    
+    if (_takerMode == HeeeTakerModePictureAndVideo) {
+        _pictureMode = YES;
+    }
+    
+    //完成拍摄，关掉闪光灯
+    if ([_videoDevice lockForConfiguration:nil]) {
+        [_videoDevice setTorchMode:AVCaptureTorchModeOff];
+        [_videoDevice unlockForConfiguration];
+    }
+    
+    __weak __typeof(self)weakSelf = self;
+    if(_videoAssetWriter && _videoAssetWriter.status == AVAssetWriterStatusWriting){
+        dispatch_async(self.writeQueue, ^{
+            //视频
+            [self.videoAssetWriter finishWritingWithCompletionHandler:^{
+                [weakSelf mergeAudioAndVideo];
+                [weakSelf destroyWrite];
+            }];
+            
+            //音频
+            [self.audioAssetWriter finishWritingWithCompletionHandler:^{
+                
+            }];
+        });
+    }else{
+        [self reset];
+        [self clearPicture];
+    }
+}
+
+//合并音视频
+-(void)mergeAudioAndVideo {
+    if ([[NSFileManager defaultManager]fileExistsAtPath:[self.videoUrl path]]) {
+        [[NSFileManager defaultManager]removeItemAtPath:[self.videoUrl path] error:nil];
+    }
+    
+    AVMutableComposition *mixComposition = [AVMutableComposition composition];
+    
+    CMTime nextClipStartTime = kCMTimeZero;
+    
+    NSDictionary *options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};
+    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:self.temVideoUrl options:options];
+    AVURLAsset *audioAsset = [[AVURLAsset alloc] initWithURL:self.temAudioUrl options:options];
+    
+    //将视频加入混合器
+    AVAssetTrack *videoAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    CMTime videoAssetTime = videoAssetTrack.timeRange.duration;
+    Float64 videoDuration = CMTimeGetSeconds(videoAssetTime);
+    
+    AVAssetTrack *audioAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    CMTime audioAssetTime = audioAssetTrack.timeRange.duration;
+    Float64 audioDuration = CMTimeGetSeconds(audioAssetTime);
+    
+    if (videoDuration == 0 || audioDuration == 0) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self reset];
+            [self.view showToast:@"视频时间太短" duration:1.5];
+        });
+        return;
+    }
+    
+    CMTimeRange video_timeRange = CMTimeRangeMake(kCMTimeZero,videoAsset.duration);
+    AVMutableCompositionTrack *a_compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    [a_compositionVideoTrack insertTimeRange:video_timeRange ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:nextClipStartTime error:nil];
+    
+    //******视频方向处理
+    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+    videoComposition.frameDuration = CMTimeMake(1,60);
+    videoComposition.renderScale = 1.0;
+    
+    AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:a_compositionVideoTrack];
+    
+    AVAssetTrack *sourceVideoTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    
+    CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(M_PI/2);
+    CGAffineTransform rotateTranslate = CGAffineTransformTranslate(rotationTransform,320,0);
+    
+    [a_compositionVideoTrack setPreferredTransform:sourceVideoTrack.preferredTransform];
+    [layerInstruction setTransform:rotateTranslate atTime:kCMTimeZero];
+    
+    instruction.layerInstructions = [NSArray arrayWithObject: layerInstruction];
+    videoComposition.instructions = [NSArray arrayWithObject: instruction];
+    
+    //将音频加入混合器
+    CMTimeRange audio_timeRange = CMTimeRangeMake(kCMTimeZero, audioAsset.duration);
+    AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    [b_compositionAudioTrack insertTimeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:nextClipStartTime error:nil];
+    
+    AVAssetExportSession *_assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPreset1920x1080];
+    _assetExport.outputFileType = @"com.apple.quicktime-movie";
+    _assetExport.outputURL = self.videoUrl;
+    
+    __weak typeof (self) weakSelf = self;
+    [_assetExport exportAsynchronouslyWithCompletionHandler:^(void ) {
+         if (_assetExport.status == AVAssetExportSessionStatusCompleted) {
+             //视频处理完成
+             dispatch_sync(dispatch_get_main_queue(), ^{
+                 [weakSelf.view hideHUD];
+                 
+                 HeeeAVPlayerController *moviePlayerVC = [HeeeAVPlayerController new];
+                 moviePlayerVC.didSelectVideo = ^{
+                     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(pictureViewController:didSelctVideo:)]) {
+                         [weakSelf.delegate pictureViewController:weakSelf didSelctVideo:weakSelf.videoUrl];
+                     }
+                     
+                     [weakSelf dismissViewControllerAnimated:NO completion:nil];
+                     [weakSelf dismissViewControllerAnimated:YES completion:nil];
+                 };
+                 
+                 moviePlayerVC.didSelectSave = ^{
+                     [weakSelf.view showHUDWithTitle:nil];
+                     
+                     //保存视频到相册
+                     if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum([weakSelf.videoUrl path])) {
+                         UISaveVideoAtPathToSavedPhotosAlbum([weakSelf.videoUrl path], weakSelf, @selector(saveVideoToAlbum:didFinishSavingWithError:contextInfo:), nil);
+                     }
+                 };
+                 
+                 weakSelf.notNeedStopRunning = YES;
+                 moviePlayerVC.player = [AVPlayer playerWithURL:weakSelf.videoUrl];
+                 [weakSelf presentViewController:moviePlayerVC animated:YES completion:nil];
+             });
+         }else{
+             dispatch_sync(dispatch_get_main_queue(), ^{
+                 [weakSelf reset];
+                 [weakSelf.view showToast:@"视频处理失败" duration:1.5];
+             });
+         }
+     }];
+}
+
+- (void)switchCameraButtonClick {
+    //获取摄像头的数量
+    NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
+    //摄像头小于等于1的时候直接返回
+    if (cameraCount <= 1) return;
+    AVCaptureDevice *newCamera = nil;
+    AVCaptureDeviceInput *newInput = nil;
+    //获取当前相机的方向(前还是后)
+    AVCaptureDevicePosition position = [[self.videoInput device] position];
+    if (position == AVCaptureDevicePositionFront) {
+        //获取后置摄像头
+        newCamera = [self cameraWithPosition:AVCaptureDevicePositionBack];
+    }else{
+        //获取前置摄像头
+        newCamera = [self cameraWithPosition:AVCaptureDevicePositionFront];
+    }
+    
+    //输入流
+    newInput = [AVCaptureDeviceInput deviceInputWithDevice:newCamera error:nil];
+    if (newInput != nil) {
+        [self.session beginConfiguration];
+        //先移除原来的input
+        [self.session removeInput:self.videoInput];
+        
+        if (position == AVCaptureDevicePositionBack) {
+            if ([UIScreen mainScreen].bounds.size.height == 480) {
+                if ([self.session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+                    [self.session setSessionPreset:AVCaptureSessionPreset640x480];
+                }
+            }else{
+                if ([self.session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+                    [self.session setSessionPreset:AVCaptureSessionPreset1280x720];
+                }
+            }
+        }else{
+            if ([UIScreen mainScreen].bounds.size.height == 480) {
+                if ([self.session canSetSessionPreset:AVCaptureSessionPresetiFrame960x540]) {
+                    [self.session setSessionPreset:AVCaptureSessionPresetiFrame960x540];
+                }
+            }else{
+                if ([self.session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+                    [self.session setSessionPreset:AVCaptureSessionPreset1920x1080];
+                }else if ([self.session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+                    [self.session setSessionPreset:AVCaptureSessionPreset1280x720];
+                }
+            }
+        }
+        
+        if ([self.session canAddInput:newInput]) {
+            [self.session addInput:newInput];
+            self.videoInput = newInput;
+        } else {
+            //如果不能加现在的input，就加原来的input
+            [self.session addInput:self.videoInput];
+        }
+        
+        
+//        if (_takerMode != HeeeTakerModePicture) {
+//            [self.session removeInput:self.audioInput];
+//            [self.session removeOutput:self.audioOutput];
+//            [self.session removeOutput:self.videoOutput];
+//
+//            //添加语音输入
+//            AVCaptureDevice *audioCaptureDevice = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] firstObject];
+//            self.audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioCaptureDevice error:nil];
+//            if ([self.session canAddInput:self.audioInput]) {
+//                [self.session addInput:self.audioInput];
+//            }
+//
+//            //添加视频输出
+//            self.videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+//            self.videoOutput.alwaysDiscardsLateVideoFrames = YES;
+//            [self.videoOutput setSampleBufferDelegate:self queue:_videoQueue];
+//            if ([self.session canAddOutput:self.videoOutput]) {
+//                [self.session addOutput:self.videoOutput];
+//            }
+//
+//            //添加语音输出
+//            self.audioOutput = [[AVCaptureAudioDataOutput alloc] init];
+//            [self.audioOutput setSampleBufferDelegate:self queue:_audioQueue];
+//            if([self.session canAddOutput:self.audioOutput]) {
+//                [self.session addOutput:self.audioOutput];
+//            }
+//        }
+        
+        [self.session commitConfiguration];
+    }
+    
+    if (_isRecoding || (_takerMode == HeeeTakerModeVideo && _flashMode == HPFlashModeOn)) {
+        [self configTorchMode];
+    }
+    
+    [self focusAtPoint:CGPointMake(_screenWidth/2, _screenHeight/2)];
+}
+
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position {
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for ( AVCaptureDevice *device in devices )
+        if ( device.position == position ) return device;
+    return nil;
+}
+
+- (void)flashButtonClick {
+    if (_flashMode < 2) {
+        _flashMode++;
+    }else{
+        _flashMode = 0;
+    }
+    
+    if ([_videoDevice hasFlash]) {
+        if (_pictureMode) {
+            [self configFlashMode];
+        }else{
+            [self configTorchMode];
+        }
+    }
+    
+    [self handleFlashNoticeLabel];
+}
+
+//拍照时
+- (void)configFlashMode {
+    if ([self.videoDevice lockForConfiguration:nil]) {
+        if (_flashMode == HPFlashModeAuto) {
+            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeAuto]) {
+                [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
+                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
+            }
+        }else if (_flashMode == HPFlashModeOn) {
+            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOn]) {
+                [_videoDevice setFlashMode:AVCaptureFlashModeOn];
+                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
+            }
+        }else{
+            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOff]) {
+                [_videoDevice setFlashMode:AVCaptureFlashModeOff];
+                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_关.png"] forState:UIControlStateNormal];
+            }
+        }
+        
+        [self.videoDevice unlockForConfiguration];
+    }
+}
+
+//拍视频时
+- (void)configTorchMode {
+    //前摄拍视频不能开闪光灯，因此当成拍照模式来处理
+    if ([[self.videoInput device] position] == AVCaptureDevicePositionBack) {
+        if ([self.videoDevice lockForConfiguration:nil]) {
+            [_videoDevice setTorchMode:AVCaptureTorchModeOff];
+            if (_flashMode == HPFlashModeAuto) {
+                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeAuto]) {
+                    if (!_isFirstComeIn) {
+                        [_videoDevice setTorchMode:AVCaptureTorchModeAuto];
+                    }
+                    
+                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
+                }
+            }else if (_flashMode == HPFlashModeOn) {
+                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeOn]) {
+                    [_videoDevice setTorchMode:AVCaptureTorchModeOn];
+                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
+                }
+            }else{
+                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeOff]) {
+                    [_videoDevice setTorchMode:AVCaptureTorchModeOff];
+                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_关.png"] forState:UIControlStateNormal];
+                }
+            }
+            [self.videoDevice unlockForConfiguration];
+        }
+    }else{
+        [self configFlashMode];
+    }
+}
+
+- (void)closeButtonClick {
+    [self closeButtonClickAnimate:YES];
+}
+
+- (void)closeButtonClickAnimate:(BOOL)animate {
+    if (self.presentingViewController) {
+        if (self.navigationController) {
+            if (self.navigationController.viewControllers.count > 1) {
+                [self.navigationController popViewControllerAnimated:animate];
+            }else{
+                [self dismissViewControllerAnimated:animate completion:nil];
+            }
+        }else{
+            [self dismissViewControllerAnimated:animate completion:nil];
+        }
+    }else{
+        [self.navigationController popViewControllerAnimated:animate];
+    }
+}
+
+#pragma mark - CAAnimationDelegate
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    if (flag) {
+        _focusViewTimer1 = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(focusViewTimer1Action) userInfo:nil repeats:NO];
+        _focusViewTimer2 = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(focusViewTimer2Action) userInfo:nil repeats:NO];
+    }
+}
+
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+    if (!_isRecoding) {
+        return;
+    }
+    
+    @autoreleasepool {
+        //视频
+        if (connection == [self.videoOutput connectionWithMediaType:AVMediaTypeVideo]) {
+            @synchronized(self) {
+                [self appendSampleBuffer:sampleBuffer ofMediaType:AVMediaTypeVideo];
+            }
+        }
+        
+        //音频
+        if (connection == [self.audioOutput connectionWithMediaType:AVMediaTypeAudio]) {
+            @synchronized(self) {
+                [self appendSampleBuffer:sampleBuffer ofMediaType:AVMediaTypeAudio];
+            }
+        }
+    }
+}
+
+//开始写入数据
+- (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer ofMediaType:(NSString *)mediaType {
+    if (sampleBuffer == NULL){
+        return;
+    }
+    
+    @synchronized(self){
+        if (!_isRecoding){
+            return;
+        }
+    }
+    
+    CFRetain(sampleBuffer);
+    dispatch_async(self.writeQueue, ^{
+        @autoreleasepool {
+            @synchronized(self) {
+                if (!self.isRecoding){
+                    CFRelease(sampleBuffer);
+                    return;
+                }
+            }
+            
+            if (self.videoAssetWriter.status != AVAssetWriterStatusWriting) {
+                [self.videoAssetWriter startWriting];
+                CMTime start_recording_time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+                CMTime startingTimeDelay = CMTimeMakeWithSeconds(0.1, 1000000000);
+                CMTime startTimeToUse = CMTimeAdd(start_recording_time, startingTimeDelay);
+                [self.videoAssetWriter startSessionAtSourceTime:startTimeToUse];
+            }
+            
+            if (self.audioAssetWriter.status != AVAssetWriterStatusWriting) {
+                [self.audioAssetWriter startWriting];
+                CMTime start_recording_time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+                [self.audioAssetWriter startSessionAtSourceTime:start_recording_time];
+            }
+            
+            //写入视频数据
+            if (mediaType == AVMediaTypeVideo && self.assetWriterVideoInput.readyForMoreMediaData) {
+                [self.assetWriterVideoInput appendSampleBuffer:sampleBuffer];
+            }
+            
+            //写入音频数据
+            if (mediaType == AVMediaTypeAudio && self.assetWriterAudioInput.readyForMoreMediaData) {
+                [self.assetWriterAudioInput appendSampleBuffer:sampleBuffer];
+            }
+            
+            CFRelease(sampleBuffer);
+        }
+    });
+}
+
+//视频保存成功
+- (void)saveVideoToAlbum:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self.view hideHUD];
+    
+    [self.presentedViewController.view showToast:@"保存视频成功" duration:1.5];
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveVideo:error:)]) {
+        [_delegate pictureViewController:self didSaveVideo:self.videoUrl error:error];
+    }
+}
+
+#pragma mark - lazy
 - (HeeePictureTakerAnimateButton *)shutterButton {
     if (!_shutterButton) {
-        _shutterButton = [[HeeePictureTakerAnimateButton alloc] initWithPictureMode:_takerMode == TakerModeVideo?NO:YES];
+        _shutterButton = [[HeeePictureTakerAnimateButton alloc] initWithPictureMode:_takerMode == HeeeTakerModeVideo?NO:YES];
         
-        if (_takerMode == TakerModePictureAndVideo) {
+        if (_takerMode == HeeeTakerModePictureAndVideo) {
             __weak typeof (self) weakSelf = self;
             _shutterButton.longPressStart = ^{
                 weakSelf.pictureMode = NO;
@@ -435,8 +1239,6 @@ typedef NS_ENUM(NSInteger,flashMode) {
             };
         }
         
-        _shutterButton.heee_centerX = _screenWidth/2;
-        _shutterButton.heee_bottom = _screenHeight - 20;
         [_shutterButton addTarget:self action:@selector(shutterButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
     }
     
@@ -537,764 +1339,6 @@ typedef NS_ENUM(NSInteger,flashMode) {
     }
     
     return _focusView;
-}
-
-#pragma mark - action
-//检测相机权限
-- (BOOL)checkCameraPermission
-{
-    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if (authStatus == AVAuthorizationStatusDenied) {
-        return NO;
-    }else{
-        return YES;
-    }
-    return YES;
-}
-
-//设置写入属性
-- (void)setUpWriter
-{
-    //视频
-    self.videoAssetWriter = [AVAssetWriter assetWriterWithURL:self.temVideoUrl fileType:AVFileTypeMPEG4 error:nil];
-    
-    NSDictionary *videoCompressionSettings = @{AVVideoCodecKey : AVVideoCodecH264,
-                                               AVVideoWidthKey : @(self.outputSize.height),
-                                               AVVideoHeightKey : @(self.outputSize.width), AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill};
-    _assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoCompressionSettings];
-    //expectsMediaDataInRealTime 必须设为yes，需要从capture session 实时获取数据
-    _assetWriterVideoInput.expectsMediaDataInRealTime = YES;
-    _assetWriterVideoInput.transform = CGAffineTransformMakeRotation(M_PI / 2.0);
-    
-    if ([_videoAssetWriter canAddInput:_assetWriterVideoInput]) {
-        [_videoAssetWriter addInput:_assetWriterVideoInput];
-    }
-    
-    //音频
-    self.audioAssetWriter = [AVAssetWriter assetWriterWithURL:self.temAudioUrl fileType:AVFileTypeAppleM4A error:nil];
-    
-    NSDictionary *audioCompressionSettings = @{AVFormatIDKey:@(kAudioFormatMPEG4AAC),
-                                               AVEncoderBitRateKey:@(128000),
-                                               AVSampleRateKey:@(44100),
-                                               AVNumberOfChannelsKey:@(1)};
-    
-    self.assetWriterAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:audioCompressionSettings];
-    self.assetWriterAudioInput.expectsMediaDataInRealTime = YES;
-    if ([self.audioAssetWriter canAddInput:self.assetWriterAudioInput]) {
-        [self.audioAssetWriter addInput:self.assetWriterAudioInput];
-    }
-    
-    _pictureMode = NO;
-    _isRecoding = YES;
-}
-
-- (void)destroyWrite
-{
-    self.videoAssetWriter = nil;
-    self.assetWriterAudioInput = nil;
-    self.assetWriterAudioInput = nil;
-    self.assetWriterVideoInput = nil;
-}
-
-//存放视频的文件夹
-- (NSString *)getVideoFolderWithName:(NSString *)name
-{
-    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *direc = [cacheDir stringByAppendingPathComponent:@"videoFolder"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:direc]) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:direc withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    
-    direc = [direc stringByAppendingPathComponent:name];
-    return direc;
-}
-
-- (void)pinchGesture:(UIPinchGestureRecognizer*)sender
-{
-    if (!_videoDevice)
-        return;
-    
-    if (sender.state == UIGestureRecognizerStateBegan)
-    {
-        _initialPinchZoom = _videoDevice.videoZoomFactor;
-    }
-    
-    if ([_videoDevice lockForConfiguration:nil]) {
-        CGFloat zoomFactor;
-        zoomFactor =  _initialPinchZoom*pow(sender.scale < 1.0?8:2, (sender.scale - 1.0f));
-        zoomFactor = MIN(5.0, zoomFactor);
-        zoomFactor = MAX(1.0, zoomFactor);
-        _videoDevice.videoZoomFactor = zoomFactor;
-        [_videoDevice unlockForConfiguration];
-    }
-}
-
-- (void)focusGesture:(UITapGestureRecognizer*)gesture{
-    CGPoint point = [gesture locationInView:gesture.view];
-    [self focusAtPoint:point];
-}
-
-- (void)focusAtPoint:(CGPoint)point{
-    CGSize size = self.view.bounds.size;
-    CGPoint focusPoint = CGPointMake( point.y /size.height ,1 - point.x/size.width );
-    
-    if ([self.videoDevice lockForConfiguration:nil]) {
-        [self.videoDevice setFocusPointOfInterest:focusPoint];
-        
-        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure ]) {
-            [self.videoDevice setExposurePointOfInterest:focusPoint];
-            //曝光量调节
-            [self.videoDevice setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
-        }
-        
-        [self.videoDevice unlockForConfiguration];
-    }
-    
-    [self clearFocusTimer];
-    
-    self.focusView.transform = CGAffineTransformIdentity;
-    self.focusView.center = point;
-    self.focusView.alpha = 1;
-    
-    //对焦框缩放动画
-    CABasicAnimation *anima = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    anima.fillMode = kCAFillModeForwards;
-    anima.removedOnCompletion = NO;
-    anima.fromValue = [NSNumber numberWithFloat:1.0f];
-    anima.toValue = [NSNumber numberWithFloat:0.6f];
-    anima.duration = 0.25;
-    anima.delegate = self;
-    [self.focusView.layer addAnimation:anima forKey:@"focusViewAnimate"];
-}
-
-- (void)handleFlashNoticeLabel {
-    if (_flashNoticeLabelTimer) {
-        [_flashNoticeLabelTimer invalidate];
-        _flashNoticeLabelTimer = nil;
-    }
-    
-    self.flashNoticeLabel.alpha = 0;
-    
-    if (_flashMode == FlashModeAuto) {
-        self.flashNoticeLabel.text = @"闪光灯-自动";
-    }else if (_flashMode == FlashModeOn) {
-        self.flashNoticeLabel.text = @"闪光灯-开";
-    }else{
-        self.flashNoticeLabel.text = @"闪光灯-关";
-    }
-    
-    [UIView animateWithDuration:0.25 animations:^{
-        self.flashNoticeLabel.alpha = 1;
-    }];
-    
-    _flashNoticeLabelTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(flashNoticeLabelTimerAction) userInfo:nil repeats:NO];
-}
-
-- (void)focusViewTimer1Action {
-    [UIView animateWithDuration:0.25 animations:^{
-        self.focusView.alpha = 0.3;
-    }];
-}
-
-- (void)focusViewTimer2Action {
-    [UIView animateWithDuration:0.25 animations:^{
-        self.focusView.alpha = 0;
-    }];
-    [self clearFocusTimer];
-}
-
-- (void)flashNoticeLabelTimerAction  {
-    [UIView animateWithDuration:0.25 animations:^{
-        self.flashNoticeLabel.alpha = 0;
-    }];
-}
-
-- (void)refreshRecodeTime {
-    _recodeTime++;
-    
-    if (_recodeTime < 60) {
-        _recodeTimeLabel.text = [NSString stringWithFormat:@"00:%02d",_recodeTime];
-    }else if (_recodeTime < 60*60) {
-        _recodeTimeLabel.text = [NSString stringWithFormat:@"%02d:%02d",_recodeTime/60,_recodeTime%60];
-    }else{
-        //最多录制1个小时
-        [self stopWrite];
-    }
-}
-
-- (void)clearFocusTimer {
-    if (_focusViewTimer1) {
-        [_focusViewTimer1 invalidate];
-        _focusViewTimer1 = nil;
-    }
-    
-    if (_focusViewTimer2) {
-        [_focusViewTimer2 invalidate];
-        _focusViewTimer2 = nil;
-    }
-    
-    [self.focusView.layer removeAllAnimations];
-    self.focusView.alpha = 0;
-}
-
-- (void)reset {
-    [self.view hideHUD];
-    _focusGesture.enabled = YES;
-    _pinchGesture.enabled = YES;
-    _recodeTimeLabel.text = @"00:00";
-    _recodeTimeBackView.alpha = 0;
-     _flashNoticeLabel.alpha = 0;
-    [_shutterButton reset];
-    _isRecoding = NO;
-    _recodeTime = 0;
-    [self clearFocusTimer];
-    
-    if (_videoDevice.isTorchActive) {
-        if ([_videoDevice lockForConfiguration:nil]) {
-            [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-            [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
-            [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
-            [_videoDevice unlockForConfiguration];
-        }
-        
-        _flashMode = FlashModeAuto;
-    }
-    
-    if (_recodeTimer) {
-        [_recodeTimer invalidate];
-        _recodeTimer = nil;
-    }
-    
-    [self destroyWrite];
-}
-
-- (void)clearPicture {
-    self.retakeBackView.hidden = YES;
-    self.selectBackView.hidden = YES;
-    self.saveBackView.hidden = YES;
-    _pictureShowIV.image = nil;
-    _pictureShowIV.hidden = YES;
-}
-
-- (void)retakePicture {
-    [self reset];
-    [self clearPicture];
-}
-
-- (void)selectPicture {
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSelectImage:)]) {
-        [_delegate pictureViewController:self didSelectImage:_image];
-    }
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-//保存照片到手机相册
-- (void)saveToAlbum {
-    UIImageWriteToSavedPhotosAlbum(_image, self, @selector(image:didFinishSavingWithError:contextInfo:), (__bridge void *)self);
-}
-
-//照片保存成功
-- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
-{
-    [self.view showToast:@"保存照片成功" duration:1.5 andPosition:@"center"];
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveImage:error:)]) {
-        [_delegate pictureViewController:self didSaveImage:image error:error];
-    }
-}
-
-- (void)shutterButtonClick {
-    if (_takerMode == TakerModeVideo) {
-        if (_isRecoding) {
-            [UIView animateWithDuration:0.25 animations:^{
-                self.recodeTimeBackView.alpha = 0;
-            } completion:^(BOOL finished) {
-                self.recodeTimeLabel.text = @"00:00";
-            }];
-            
-            [self stopWrite];
-            
-            if (self.recodeTimer) {
-                [self.recodeTimer invalidate];
-                self.recodeTimer = nil;
-            }
-            
-            self.recodeTime = 0;
-        }else{
-            [UIView animateWithDuration:0.25 animations:^{
-                self.recodeTimeBackView.alpha = 1.0;
-            }];
-            
-            [self configTorchMode];
-            
-            [self startWrite];
-            
-            if (self.recodeTimer == nil) {
-                self.recodeTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(refreshRecodeTime) userInfo:nil repeats:YES];
-            }
-        }
-    }else if (_pictureMode) {
-        [self.view hideHUD];
-        
-        _pictureShowIV.hidden = NO;
-        _focusGesture.enabled = NO;
-        _pinchGesture.enabled = NO;
-        
-        AVCaptureConnection *videoConnection = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
-        if (videoConnection ==  nil) {
-            _pictureShowIV.hidden = YES;
-            _focusGesture.enabled = YES;
-            _pinchGesture.enabled = YES;
-            return;
-        }
-        
-        //前置摄像头时，设置镜像图片
-        AVCaptureDevicePosition position = [[self.videoInput device] position];
-        if (position == AVCaptureDevicePositionFront) {
-            videoConnection.videoMirrored = YES;
-        }
-        
-        __weak typeof (self) weakSelf = self;
-        [self.imageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-            if (imageDataSampleBuffer == nil) {
-                weakSelf.pictureShowIV.hidden = YES;
-                weakSelf.focusGesture.enabled = YES;
-                weakSelf.pinchGesture.enabled = YES;
-                return;
-            }
-            
-            NSData *imageData =  [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-            weakSelf.image = [UIImage imageWithData:imageData];
-            weakSelf.pictureShowIV.image = weakSelf.image;
-            weakSelf.retakeBackView.hidden = weakSelf.pictureShowIV.hidden;
-            weakSelf.selectBackView.hidden = weakSelf.pictureShowIV.hidden;
-            weakSelf.saveBackView.hidden = weakSelf.pictureShowIV.hidden;
-        }];
-    }
-}
-
-- (void)startWrite
-{
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.temVideoUrl path]]) {
-        [[NSFileManager defaultManager] removeItemAtPath:[self.temVideoUrl path] error:nil];
-    }
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.temAudioUrl path]]) {
-        [[NSFileManager defaultManager] removeItemAtPath:[self.temAudioUrl path] error:nil];
-    }
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[self.videoUrl path]]) {
-        [[NSFileManager defaultManager] removeItemAtPath:[self.videoUrl path] error:nil];
-    }
-    
-    [self setUpWriter];
-}
-
-- (void)stopWrite
-{
-    [self.view showHUDWithTitle:nil];
-    
-    if (_takerMode == TakerModePictureAndVideo) {
-        //这种情况录视频，最好把shutterButton移除再加上，否则会走shutterButtonClick，造成不必要的问题。
-        [self.shutterButton removeFromSuperview];
-        self.shutterButton.userInteractionEnabled = NO;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            self.shutterButton.userInteractionEnabled = YES;
-        });
-        [self.view insertSubview:self.shutterButton belowSubview:_pictureShowIV];
-    }
-    
-    _isRecoding = NO;
-    
-    if (_takerMode == TakerModePictureAndVideo) {
-        _pictureMode = YES;
-    }
-    
-    //完成拍摄，关掉闪光灯
-    if ([_videoDevice lockForConfiguration:nil]) {
-        [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-        [_videoDevice unlockForConfiguration];
-    }
-    
-    __weak __typeof(self)weakSelf = self;
-    if(_videoAssetWriter && _videoAssetWriter.status == AVAssetWriterStatusWriting){
-        dispatch_async(self.writeQueue, ^{
-            //视频
-            [self.videoAssetWriter finishWritingWithCompletionHandler:^{
-                [weakSelf mergeAudioAndVideo];
-                [weakSelf destroyWrite];
-            }];
-            
-            //音频
-            [self.audioAssetWriter finishWritingWithCompletionHandler:^{
-                
-            }];
-        });
-    }else{
-        [self reset];
-        [self clearPicture];
-    }
-}
-
-//合并音视频
--(void)mergeAudioAndVideo {
-    if ([[NSFileManager defaultManager]fileExistsAtPath:[self.videoUrl path]]) {
-        [[NSFileManager defaultManager]removeItemAtPath:[self.videoUrl path] error:nil];
-    }
-    
-    AVMutableComposition *mixComposition = [AVMutableComposition composition];
-    
-    CMTime nextClipStartTime = kCMTimeZero;
-    
-    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:self.temVideoUrl options:nil];
-    AVURLAsset *audioAsset = [[AVURLAsset alloc] initWithURL:self.temAudioUrl options:nil];
-    
-    //绝大部分时候都是音频时长大于视频时长，音频写入时长不能超过视频时长，否则出现有声音没图像的现象；如果视频时长大于音频时长，音频写入就用音频的实际长度。
-    CMTime videoAssetTime = [videoAsset duration];
-    Float64 videoDuration = CMTimeGetSeconds(videoAssetTime);
-    CMTime audioAssetTime = [audioAsset duration];
-    Float64 audioDuration = CMTimeGetSeconds(audioAssetTime);
-    
-    if (videoDuration == 0 || audioDuration == 0) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self reset];
-            [self.view showToast:@"视频时间太短" duration:1.5];
-        });
-        return;
-    }
-    
-    CMTimeRange video_timeRange = CMTimeRangeMake(kCMTimeZero,videoAsset.duration);
-    AVMutableCompositionTrack *a_compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    [a_compositionVideoTrack insertTimeRange:video_timeRange ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:nextClipStartTime error:nil];
-    
-    //******视频方向处理
-    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
-    videoComposition.frameDuration = CMTimeMake(1,60);
-    videoComposition.renderScale = 1.0;
-    
-    AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-    
-    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:a_compositionVideoTrack];
-    
-    AVAssetTrack *sourceVideoTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    
-    CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(M_PI/2);
-    CGAffineTransform rotateTranslate = CGAffineTransformTranslate(rotationTransform,320,0);
-    
-    [a_compositionVideoTrack setPreferredTransform:sourceVideoTrack.preferredTransform];
-    [layerInstruction setTransform:rotateTranslate atTime:kCMTimeZero];
-    
-    instruction.layerInstructions = [NSArray arrayWithObject: layerInstruction];
-    videoComposition.instructions = [NSArray arrayWithObject: instruction];
-    //******
-    
-    CMTimeRange audio_timeRange = CMTimeRangeMake(kCMTimeZero, audioAsset.duration);
-    AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-    [b_compositionAudioTrack insertTimeRange:videoDuration<audioDuration?video_timeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:nextClipStartTime error:nil];
-    
-    AVAssetExportSession *_assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPreset1920x1080];
-    _assetExport.outputFileType = @"com.apple.quicktime-movie";
-    _assetExport.outputURL = self.videoUrl;
-    
-    __weak typeof (self) weakSelf = self;
-    [_assetExport exportAsynchronouslyWithCompletionHandler:^(void ) {
-         if (_assetExport.status == AVAssetExportSessionStatusCompleted) {
-             //视频处理完成
-             dispatch_sync(dispatch_get_main_queue(), ^{
-                 [weakSelf.view hideHUD];
-                 
-                 HeeeAVPlayerViewController *moviePlayerVC = [HeeeAVPlayerViewController new];
-                 moviePlayerVC.didSelectVideo = ^{
-                     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(pictureViewController:didSelctVideo:)]) {
-                         [weakSelf.delegate pictureViewController:weakSelf didSelctVideo:weakSelf.videoUrl];
-                     }
-                     
-                     [weakSelf dismissViewControllerAnimated:NO completion:nil];
-                     [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                 };
-                 
-                 moviePlayerVC.didSelectSave = ^{
-                     [weakSelf.view showHUDWithTitle:nil];
-                     
-                     //保存视频到相册
-                     if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum([weakSelf.videoUrl path])) {
-                         UISaveVideoAtPathToSavedPhotosAlbum([weakSelf.videoUrl path], weakSelf, @selector(saveVideoToAlbum:didFinishSavingWithError:contextInfo:), nil);
-                     }
-                 };
-                 
-                 weakSelf.notNeedStopRunning = YES;
-                 moviePlayerVC.player = [AVPlayer playerWithURL:weakSelf.videoUrl];
-                 [weakSelf presentViewController:moviePlayerVC animated:YES completion:nil];
-             });
-         }else{
-             dispatch_sync(dispatch_get_main_queue(), ^{
-                 [weakSelf reset];
-                 [weakSelf.view showToast:@"视频处理失败" duration:1.5];
-             });
-         }
-     }];
-}
-
-- (void)switchCameraButtonClick {
-    //获取摄像头的数量
-    NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
-    //摄像头小于等于1的时候直接返回
-    if (cameraCount <= 1) return;
-    AVCaptureDevice *newCamera = nil;
-    AVCaptureDeviceInput *newInput = nil;
-    //获取当前相机的方向(前还是后)
-    AVCaptureDevicePosition position = [[self.videoInput device] position];
-    if (position == AVCaptureDevicePositionFront) {
-        //获取后置摄像头
-        newCamera = [self cameraWithPosition:AVCaptureDevicePositionBack];
-    }else{
-        //获取前置摄像头
-        newCamera = [self cameraWithPosition:AVCaptureDevicePositionFront];
-    }
-    
-    //输入流
-    newInput = [AVCaptureDeviceInput deviceInputWithDevice:newCamera error:nil];
-    if (newInput != nil) {
-        [self.session beginConfiguration];
-        //先移除原来的input
-        [self.session removeInput:self.videoInput];
-        
-        if (position == AVCaptureDevicePositionBack) {
-            if ([UIScreen mainScreen].bounds.size.height == 480) {
-                if ([self.session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
-                    [self.session setSessionPreset:AVCaptureSessionPreset640x480];
-                }
-            }else{
-                if ([self.session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-                    [self.session setSessionPreset:AVCaptureSessionPreset1280x720];
-                }
-            }
-        }else{
-            if ([UIScreen mainScreen].bounds.size.height == 480) {
-                if ([self.session canSetSessionPreset:AVCaptureSessionPresetiFrame960x540]) {
-                    [self.session setSessionPreset:AVCaptureSessionPresetiFrame960x540];
-                }
-            }else{
-                if ([self.session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
-                    [self.session setSessionPreset:AVCaptureSessionPreset1920x1080];
-                }else if ([self.session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-                    [self.session setSessionPreset:AVCaptureSessionPreset1280x720];
-                }
-            }
-        }
-        
-        if ([self.session canAddInput:newInput]) {
-            [self.session addInput:newInput];
-            self.videoInput = newInput;
-        } else {
-            //如果不能加现在的input，就加原来的input
-            [self.session addInput:self.videoInput];
-        }
-        
-        [self.session commitConfiguration];
-    }
-    
-    if (_isRecoding || (_takerMode == TakerModeVideo && _flashMode == FlashModeOn)) {
-        [self configTorchMode];
-    }
-    
-    [self focusAtPoint:CGPointMake(_screenWidth/2, _screenHeight/2)];
-}
-
-- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position{
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    for ( AVCaptureDevice *device in devices )
-        if ( device.position == position ) return device;
-    return nil;
-}
-
-- (void)flashButtonClick {
-    if (_flashMode < 2) {
-        _flashMode++;
-    }else{
-        _flashMode = 0;
-    }
-    
-    if ([_videoDevice hasFlash]) {
-        if (_pictureMode) {
-            [self configFlashMode];
-        }else{
-            [self configTorchMode];
-        }
-    }
-    
-    [self handleFlashNoticeLabel];
-}
-
-//拍照时
-- (void)configFlashMode {
-    if ([self.videoDevice lockForConfiguration:nil]) {
-        if (_flashMode == FlashModeAuto) {
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeAuto]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
-                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
-            }
-        }else if (_flashMode == FlashModeOn) {
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOn]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeOn];
-                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
-            }
-        }else{
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOff]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeOff];
-                [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_关.png"] forState:UIControlStateNormal];
-            }
-        }
-        
-        [self.videoDevice unlockForConfiguration];
-    }
-}
-
-//拍视频时
-- (void)configTorchMode {
-    //前摄拍视频不能开闪光灯，因此当成拍照模式来处理
-    if ([[self.videoInput device] position] == AVCaptureDevicePositionBack) {
-        if ([self.videoDevice lockForConfiguration:nil]) {
-            [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-            if (_flashMode == FlashModeAuto) {
-                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeAuto]) {
-                    if (!_isFirstComeIn) {
-                        [_videoDevice setTorchMode:AVCaptureTorchModeAuto];
-                    }
-                    
-                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
-                }
-            }else if (_flashMode == FlashModeOn) {
-                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeOn]) {
-                    [_videoDevice setTorchMode:AVCaptureTorchModeOn];
-                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
-                }
-            }else{
-                if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeOff]) {
-                    [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-                    [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_关.png"] forState:UIControlStateNormal];
-                }
-            }
-            [self.videoDevice unlockForConfiguration];
-        }
-    }else{
-        [self configFlashMode];
-    }
-}
-
-- (void)closeButtonClick {
-    [self closeButtonClickAnimate:YES];
-}
-
-- (void)closeButtonClickAnimate:(BOOL)animate {
-    if (self.presentingViewController) {
-        if (self.navigationController) {
-            if (self.navigationController.viewControllers.count > 1) {
-                [self.navigationController popViewControllerAnimated:animate];
-            }else{
-                [self dismissViewControllerAnimated:animate completion:nil];
-            }
-        }else{
-            [self dismissViewControllerAnimated:animate completion:nil];
-        }
-    }else{
-        [self.navigationController popViewControllerAnimated:animate];
-    }
-}
-
-#pragma mark - CAAnimationDelegate
-- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
-    if (flag) {
-        _focusViewTimer1 = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(focusViewTimer1Action) userInfo:nil repeats:NO];
-        _focusViewTimer2 = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(focusViewTimer2Action) userInfo:nil repeats:NO];
-    }
-}
-
-#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
-- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
-{
-    if (!_isRecoding) {
-        return;
-    }
-    
-    @autoreleasepool {
-        //视频
-        if (connection == [self.videoOutput connectionWithMediaType:AVMediaTypeVideo]) {
-            @synchronized(self) {
-                [self appendSampleBuffer:sampleBuffer ofMediaType:AVMediaTypeVideo];
-            }
-        }
-        
-        //音频
-        if (connection == [self.audioOutput connectionWithMediaType:AVMediaTypeAudio]) {
-            @synchronized(self) {
-                [self appendSampleBuffer:sampleBuffer ofMediaType:AVMediaTypeAudio];
-            }
-        }
-    }
-}
-
-//开始写入数据
-- (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer ofMediaType:(NSString *)mediaType
-{
-    if (sampleBuffer == NULL){
-        return;
-    }
-    
-    @synchronized(self){
-        if (!_isRecoding){
-            return;
-        }
-    }
-    
-    CFRetain(sampleBuffer);
-    dispatch_async(self.writeQueue, ^{
-        @autoreleasepool {
-            @synchronized(self) {
-                if (!self.isRecoding){
-                    CFRelease(sampleBuffer);
-                    return;
-                }
-            }
-            
-            if (self.videoAssetWriter.status != AVAssetWriterStatusWriting) {
-                [self.videoAssetWriter startWriting];
-                [self.videoAssetWriter startSessionAtSourceTime:CMSampleBufferGetPresentationTimeStamp(sampleBuffer)];
-            }
-            
-            if (self.audioAssetWriter.status != AVAssetWriterStatusWriting) {
-                [self.audioAssetWriter startWriting];
-                [self.audioAssetWriter startSessionAtSourceTime:CMSampleBufferGetPresentationTimeStamp(sampleBuffer)];
-            }
-            
-            //写入视频数据
-            if (mediaType == AVMediaTypeVideo && self.assetWriterVideoInput.readyForMoreMediaData) {
-                [self.assetWriterVideoInput appendSampleBuffer:sampleBuffer];
-            }
-            
-            //写入音频数据
-            if (mediaType == AVMediaTypeAudio && self.assetWriterAudioInput.readyForMoreMediaData) {
-                [self.assetWriterAudioInput appendSampleBuffer:sampleBuffer];
-            }
-            
-            CFRelease(sampleBuffer);
-        }
-    } );
-}
-
-//视频保存成功
-- (void)saveVideoToAlbum:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    [self.view hideHUD];
-    
-    [self.presentedViewController.view showToast:@"保存视频成功" duration:1.5];
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveVideo:error:)]) {
-        [_delegate pictureViewController:self didSaveVideo:self.videoUrl error:error];
-    }
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

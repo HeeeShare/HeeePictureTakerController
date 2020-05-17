@@ -1,16 +1,16 @@
 //
-//  HeeeAVPlayerViewController.m
+//  HeeeAVPlayerController.m
 //  PictureTaker
 //
 //  Created by diipo on 2018/8/9.
 //  Copyright © 2018年 hgy. All rights reserved.
 //
 
-#import "HeeeAVPlayerViewController.h"
+#import "HeeeAVPlayerController.h"
 #import <CoreVideo/CoreVideo.h>
 #import "UIView+HeeeToast.h"
 
-@interface HeeeAVPlayerViewController ()
+@interface HeeeAVPlayerController ()
 @property (nonatomic,strong) UIVisualEffectView *backView;
 @property (nonatomic,strong) UIVisualEffectView *saveBackView;
 @property (nonatomic,strong) CADisplayLink *displayLink;
@@ -18,7 +18,7 @@
 
 @end
 
-@implementation HeeeAVPlayerViewController
+@implementation HeeeAVPlayerController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -57,7 +57,12 @@
 - (UIVisualEffectView *)backView {
     if (!_backView) {
         _backView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:(UIBlurEffectStyleDark)]];
-        _backView.frame = CGRectMake(6, 80, 60, 47);
+        
+        if (@available(iOS 11.0, *)) {
+            _backView.frame = CGRectMake(6, 70 + [UIApplication sharedApplication].keyWindow.safeAreaInsets.top, 60, 47);
+        }else{
+            _backView.frame = CGRectMake(6, 80, 60, 47);
+        }
         _backView.alpha = 0;
         _backView.layer.cornerRadius = 14;
         _backView.clipsToBounds = YES;

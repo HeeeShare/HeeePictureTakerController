@@ -1,5 +1,5 @@
 //
-//  HeeeAVPlayerViewController.h
+//  HeeeAVPlayerController.h
 //  PictureTaker
 //
 //  Created by diipo on 2018/8/9.
@@ -11,7 +11,7 @@
 typedef void(^didSelectVideoBlock)(void);
 typedef void(^didSelectSaveBlock)(void);
 
-@interface HeeeAVPlayerViewController : AVPlayerViewController
+@interface HeeeAVPlayerController : AVPlayerViewController
 @property (nonatomic,copy) didSelectVideoBlock didSelectVideo;
 @property (nonatomic,copy) didSelectSaveBlock didSelectSave;
 
