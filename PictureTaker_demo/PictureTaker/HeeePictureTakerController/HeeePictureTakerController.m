@@ -825,7 +825,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     CMTime videoAssetTime = videoAssetTrack.timeRange.duration;
     Float64 videoDuration = CMTimeGetSeconds(videoAssetTime);
     
-    AVAssetTrack *audioAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    AVAssetTrack *audioAssetTrack = [[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0];
     CMTime audioAssetTime = audioAssetTrack.timeRange.duration;
     Float64 audioDuration = CMTimeGetSeconds(audioAssetTime);
     
@@ -864,7 +864,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     //将音频加入混合器
     CMTimeRange audio_timeRange = CMTimeRangeMake(kCMTimeZero, audioAsset.duration);
     AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-    [b_compositionAudioTrack insertTimeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:nextClipStartTime error:nil];
+    [b_compositionAudioTrack insertTimeRange:audioDuration>videoDuration?video_timeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:nextClipStartTime error:nil];
     
     AVAssetExportSession *_assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPreset1920x1080];
     _assetExport.outputFileType = @"com.apple.quicktime-movie";
