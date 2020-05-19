@@ -509,13 +509,14 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 
 - (void)focusAtPoint:(CGPoint)point {
     CGSize size = self.view.bounds.size;
-    CGPoint focusPoint = CGPointMake( point.y /size.height ,1 - point.x/size.width );
+    CGPoint focusPoint = CGPointMake(point.y /size.height ,1 - point.x/size.width);
     
     if ([self.videoDevice lockForConfiguration:nil]) {
         [self.videoDevice setFocusPointOfInterest:focusPoint];
         
-        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure ]) {
+        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
             [self.videoDevice setExposurePointOfInterest:focusPoint];
+            [self.videoDevice setFocusMode:AVCaptureFocusModeAutoFocus];
             //曝光量调节
             [self.videoDevice setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
         }
@@ -964,35 +965,6 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
             //如果不能加现在的input，就加原来的input
             [self.session addInput:self.videoInput];
         }
-        
-        
-//        if (_takerMode != HeeeTakerModePicture) {
-//            [self.session removeInput:self.audioInput];
-//            [self.session removeOutput:self.audioOutput];
-//            [self.session removeOutput:self.videoOutput];
-//
-//            //添加语音输入
-//            AVCaptureDevice *audioCaptureDevice = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] firstObject];
-//            self.audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioCaptureDevice error:nil];
-//            if ([self.session canAddInput:self.audioInput]) {
-//                [self.session addInput:self.audioInput];
-//            }
-//
-//            //添加视频输出
-//            self.videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-//            self.videoOutput.alwaysDiscardsLateVideoFrames = YES;
-//            [self.videoOutput setSampleBufferDelegate:self queue:_videoQueue];
-//            if ([self.session canAddOutput:self.videoOutput]) {
-//                [self.session addOutput:self.videoOutput];
-//            }
-//
-//            //添加语音输出
-//            self.audioOutput = [[AVCaptureAudioDataOutput alloc] init];
-//            [self.audioOutput setSampleBufferDelegate:self queue:_audioQueue];
-//            if([self.session canAddOutput:self.audioOutput]) {
-//                [self.session addOutput:self.audioOutput];
-//            }
-//        }
         
         [self.session commitConfiguration];
     }
