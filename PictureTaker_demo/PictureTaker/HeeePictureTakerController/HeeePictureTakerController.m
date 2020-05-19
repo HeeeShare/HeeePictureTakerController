@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, strong) UITapGestureRecognizer        *focusGesture;//对焦手势
 @property (nonatomic, strong) UIPinchGestureRecognizer      *pinchGesture;//缩放手势
 @property (nonatomic, strong) NSTimer                       *focusViewTimer1,*focusViewTimer2,*flashNoticeLabelTimer,*recodeTimer;//控制控件显示的timer
-@property (nonatomic, assign) HPFlashMode                     flashMode;//0:自动，1:打开，2:关闭
+@property (nonatomic, assign) HPFlashMode                   flashMode;//0:自动，1:打开，2:关闭
 @property (nonatomic, assign) CGFloat                       initialPinchZoom;
 @property (nonatomic, assign) BOOL                          pictureMode;//没有在录视频的标志
 @property (nonatomic, assign) int                           recodeTime;
@@ -656,8 +656,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 }
 
 - (void)selectPicture {
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSelectImage:)]) {
-        [_delegate pictureViewController:self didSelectImage:_image];
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureTaker:didSelectImage:)]) {
+        [_delegate pictureTaker:self didSelectImage:_image];
     }
     
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -671,8 +671,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 //照片保存成功
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     [self.view showToast:@"保存照片成功" duration:1.5 andPosition:@"center"];
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveImage:error:)]) {
-        [_delegate pictureViewController:self didSaveImage:image error:error];
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureTaker:didSaveImage:error:)]) {
+        [_delegate pictureTaker:self didSaveImage:image error:error];
     }
 }
 
@@ -880,8 +880,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
                  
                  HeeeAVPlayerController *moviePlayerVC = [HeeeAVPlayerController new];
                  moviePlayerVC.didSelectVideo = ^{
-                     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(pictureViewController:didSelctVideo:)]) {
-                         [weakSelf.delegate pictureViewController:weakSelf didSelctVideo:weakSelf.videoUrl];
+                     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(pictureTaker:didSelctVideo:)]) {
+                         [weakSelf.delegate pictureTaker:weakSelf didSelctVideo:weakSelf.videoUrl];
                      }
                      
                      [weakSelf dismissViewControllerAnimated:NO completion:nil];
@@ -1164,8 +1164,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     [self.view hideHUD];
     
     [self.presentedViewController.view showToast:@"保存视频成功" duration:1.5];
-    if (_delegate && [_delegate respondsToSelector:@selector(pictureViewController:didSaveVideo:error:)]) {
-        [_delegate pictureViewController:self didSaveVideo:self.videoUrl error:error];
+    if (_delegate && [_delegate respondsToSelector:@selector(pictureTaker:didSaveVideo:error:)]) {
+        [_delegate pictureTaker:self didSaveVideo:self.videoUrl error:error];
     }
 }
 

@@ -17,10 +17,10 @@ typedef NS_ENUM(NSUInteger,HeeePictureTakerMode) {
 @class HeeePictureTakerController;
 @protocol HeeePictureTakerViewControllerDelegate <NSObject>
 @optional
-- (void)pictureViewController:(HeeePictureTakerController *)pictureTaker didSelectImage:(UIImage *)image;
-- (void)pictureViewController:(HeeePictureTakerController *)pictureTaker didSaveImage:(UIImage *)image error:(NSError *)error;
-- (void)pictureViewController:(HeeePictureTakerController *)pictureTaker didSelctVideo:(NSURL *)videoPath;
-- (void)pictureViewController:(HeeePictureTakerController *)pictureTaker didSaveVideo:(NSURL *)videoPath error:(NSError *)error;
+- (void)pictureTaker:(HeeePictureTakerController *)pictureTaker didSelectImage:(UIImage *)image;
+- (void)pictureTaker:(HeeePictureTakerController *)pictureTaker didSaveImage:(UIImage *)image error:(NSError *)error;
+- (void)pictureTaker:(HeeePictureTakerController *)pictureTaker didSelctVideo:(NSURL *)videoPath;
+- (void)pictureTaker:(HeeePictureTakerController *)pictureTaker didSaveVideo:(NSURL *)videoPath error:(NSError *)error;
 
 @end
 
