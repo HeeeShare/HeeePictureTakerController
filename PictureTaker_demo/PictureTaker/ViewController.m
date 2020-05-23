@@ -17,6 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     UIButton *pictureBtn = [self makeButtonWithTitle:@"照片模式"];
     pictureBtn.frame = CGRectMake(60, 60, 160, 50);
     [self.view addSubview:pictureBtn];
@@ -51,9 +52,9 @@
 
 - (UIButton *)makeButtonWithTitle:(NSString *)title {
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
-    btn.titleLabel.font = [UIFont systemFontOfSize:18 weight:0.3];
+    btn.titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightMedium];
     btn.frame = CGRectMake(60, 60, 160, 50);
-    btn.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
+    btn.backgroundColor = [UIColor colorWithWhite:0.92 alpha:1.0];
     [btn setTitle:title forState:(UIControlStateNormal)];
     return btn;
 }

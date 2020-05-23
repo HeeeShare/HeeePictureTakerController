@@ -516,7 +516,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         
         if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
             [self.videoDevice setExposurePointOfInterest:focusPoint];
-            [self.videoDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+            [self.videoDevice setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
             //曝光量调节
             [self.videoDevice setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
         }
