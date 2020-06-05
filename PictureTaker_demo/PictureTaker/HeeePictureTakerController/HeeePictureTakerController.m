@@ -822,11 +822,11 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     AVURLAsset *audioAsset = [[AVURLAsset alloc] initWithURL:self.temAudioUrl options:options];
     
     //将视频加入混合器
-    AVAssetTrack *videoAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    AVAssetTrack *videoAssetTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo].firstObject;
     CMTime videoAssetTime = videoAssetTrack.timeRange.duration;
     Float64 videoDuration = CMTimeGetSeconds(videoAssetTime);
     
-    AVAssetTrack *audioAssetTrack = [[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0];
+    AVAssetTrack *audioAssetTrack = [audioAsset tracksWithMediaType:AVMediaTypeAudio].firstObject;
     CMTime audioAssetTime = audioAssetTrack.timeRange.duration;
     Float64 audioDuration = CMTimeGetSeconds(audioAssetTime);
     
@@ -840,7 +840,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     CMTimeRange video_timeRange = CMTimeRangeMake(kCMTimeZero,videoAsset.duration);
     AVMutableCompositionTrack *a_compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    [a_compositionVideoTrack insertTimeRange:video_timeRange ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:nextClipStartTime error:nil];
+    [a_compositionVideoTrack insertTimeRange:video_timeRange ofTrack:[videoAsset tracksWithMediaType:AVMediaTypeVideo].firstObject atTime:nextClipStartTime error:nil];
     
     //******视频方向处理
     AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
@@ -851,7 +851,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:a_compositionVideoTrack];
     
-    AVAssetTrack *sourceVideoTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    AVAssetTrack *sourceVideoTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo].firstObject;
     
     CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(M_PI/2);
     CGAffineTransform rotateTranslate = CGAffineTransformTranslate(rotationTransform,320,0);
@@ -865,7 +865,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     //将音频加入混合器
     CMTimeRange audio_timeRange = CMTimeRangeMake(kCMTimeZero, audioAsset.duration);
     AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-    [b_compositionAudioTrack insertTimeRange:audioDuration>videoDuration?video_timeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:nextClipStartTime error:nil];
+    [b_compositionAudioTrack insertTimeRange:audioDuration>videoDuration?video_timeRange:audio_timeRange ofTrack:[audioAsset tracksWithMediaType:AVMediaTypeAudio].firstObject atTime:nextClipStartTime error:nil];
     
     AVAssetExportSession *_assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPreset1920x1080];
     _assetExport.outputFileType = @"com.apple.quicktime-movie";
