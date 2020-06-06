@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 typedef NS_ENUM(NSUInteger,HeeePictureTakerMode) {
     HeeeTakerModePicture,
@@ -25,10 +26,9 @@ typedef NS_ENUM(NSUInteger,HeeePictureTakerMode) {
 @end
 
 @interface HeeePictureTakerController : UIViewController
-//照片展示
-@property (nonatomic,strong) UIImageView *pictureShowIV;
 @property (nonatomic,assign) HeeePictureTakerMode takerMode;
-@property (nonatomic,  weak) id<HeeePictureTakerViewControllerDelegate> delegate;
+@property (nonatomic,assign) AVCaptureSessionPreset videoQuality;//默认：AVCaptureSessionPreset1920x1080
+@property (nonatomic,weak) id<HeeePictureTakerViewControllerDelegate> delegate;
 
 - (instancetype)initWithTakerMode:(HeeePictureTakerMode)takerMode;
 

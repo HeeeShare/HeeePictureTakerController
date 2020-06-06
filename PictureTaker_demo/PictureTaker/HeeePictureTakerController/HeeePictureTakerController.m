@@ -7,7 +7,6 @@
 //
 
 #import "HeeePictureTakerController.h"
-#import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
 #import "HeeePictureTakerAnimateButton.h"
 #import "HeeeAVPlayerController.h"
@@ -48,6 +47,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, assign) CGSize                        outputSize;//视频分辨率大小
 
 /*UI*/
+@property (nonatomic, strong) UIImageView                   *pictureShowIV;//照片展示
 @property (nonatomic, strong) UIVisualEffectView            *maskView;
 @property (nonatomic, strong) UIView                        *gestureView;//用于添加手势的view
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer    *previewLayer;//用于显示摄像头画面
@@ -118,6 +118,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     self = [super init];
     if (self) {
         _takerMode = takerMode;
+        _videoQuality = AVCaptureSessionPreset1920x1080;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
     }
     
@@ -134,7 +135,13 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     self.videoUrl = [[NSURL alloc] initFileURLWithPath:[self getVideoFolderWithName:@"video.mp4"]];
     self.temVideoUrl = [[NSURL alloc] initFileURLWithPath:[self getVideoFolderWithName:@"temVideo.mp4"]];
     self.temAudioUrl = [[NSURL alloc] initFileURLWithPath:[self getVideoFolderWithName:@"temAudio.m4a"]];
-    _outputSize = CGSizeMake(1080, 1920);
+    
+    NSArray *arr = [self.videoQuality componentsSeparatedByString:@"x"];
+    if (arr.count == 2) {
+        NSString *firstSize = [self getNumberFromStr:arr[1]];
+        NSString *secondSize = [self getNumberFromStr:arr[0]];
+        _outputSize = CGSizeMake(firstSize.integerValue, secondSize.integerValue);
+    }
     
     if (_takerMode != HeeeTakerModeVideo) {
         _pictureMode = YES;
@@ -151,6 +158,11 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         [self configCamera];
         [self addSubViews];
     }
+}
+
+- (NSString *)getNumberFromStr:(NSString *)str {
+    NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    return[[str componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -349,13 +361,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     //生成会话，用来结合输入输出
     self.session = [[AVCaptureSession alloc]init];
-    
     [self.session beginConfiguration];
-    if ([self.session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
-        [self.session setSessionPreset:AVCaptureSessionPreset1920x1080];
-    }else if ([self.session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-        [self.session setSessionPreset:AVCaptureSessionPreset1280x720];
-    }
+    [self.session setSessionPreset:self.videoQuality];
     
     //添加视频输入
     self.videoInput = [AVCaptureDeviceInput deviceInputWithDevice:[self cameraWithPosition:AVCaptureDevicePositionBack] error:nil];
@@ -430,7 +437,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 }
 
 //设置写入属性
-- (void)setUpWriter {
+- (void)setupWriter {
     //视频
     self.videoAssetWriter = [AVAssetWriter assetWriterWithURL:self.temVideoUrl fileType:AVFileTypeMPEG4 error:nil];
     
@@ -759,7 +766,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         [[NSFileManager defaultManager] removeItemAtPath:[self.videoUrl path] error:nil];
     }
     
-    [self setUpWriter];
+    [self setupWriter];
 }
 
 - (void)stopWrite {
