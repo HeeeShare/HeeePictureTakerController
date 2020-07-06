@@ -9,20 +9,20 @@
 #import <UIKit/UIKit.h>
 
 @interface UIView (HeeeQuickFrame)
-@property (nonatomic) CGFloat heee_left;
-@property (nonatomic) CGFloat heee_top;
-@property (nonatomic) CGFloat heee_right;
-@property (nonatomic) CGFloat heee_bottom;
-@property (nonatomic) CGFloat heee_width;
-@property (nonatomic) CGFloat heee_height;
-@property (nonatomic) CGPoint heee_origin;
-@property (nonatomic) CGSize  heee_size;
-@property (nonatomic) CGFloat heee_centerX;
-@property (nonatomic) CGPoint heee_topRight;
-@property (nonatomic) CGPoint heee_bottomLeft;
-@property (nonatomic) CGPoint heee_bottomRight;
-@property (nonatomic) CGFloat heee_centerY;
-@property (nonatomic) CGFloat heee_rightToSuper;
-@property (nonatomic) CGFloat heee_bottomToSuper;
+@property (nonatomic) CGFloat left;
+@property (nonatomic) CGFloat top;
+@property (nonatomic) CGFloat right;
+@property (nonatomic) CGFloat bottom;
+@property (nonatomic) CGFloat width;
+@property (nonatomic) CGFloat height;
+@property (nonatomic) CGPoint origin;
+@property (nonatomic) CGSize  size;
+@property (nonatomic) CGFloat centerX;
+@property (nonatomic) CGPoint topRight;
+@property (nonatomic) CGPoint bottomLeft;
+@property (nonatomic) CGPoint bottomRight;
+@property (nonatomic) CGFloat centerY;
+@property (nonatomic) CGFloat rightToSuper;
+@property (nonatomic) CGFloat bottomToSuper;
 
 @end

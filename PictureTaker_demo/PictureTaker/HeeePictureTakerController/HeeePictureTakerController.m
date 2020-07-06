@@ -173,12 +173,12 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     _gestureView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
     _maskView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
     _pictureShowIV.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
-    self.retakeBackView.heee_bottom = _screenHeight - 80;
-    self.saveBackView.heee_bottom = self.retakeBackView.heee_top - 10;
-    self.selectBackView.heee_bottom = self.saveBackView.heee_top - 10;
+    self.retakeBackView.bottom = _screenHeight - 80;
+    self.saveBackView.bottom = self.retakeBackView.top - 10;
+    self.selectBackView.bottom = self.saveBackView.top - 10;
     self.previewLayer.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
-    self.shutterButton.heee_centerX = _screenWidth/2;
-    self.shutterButton.heee_bottom = _screenHeight - 34;
+    self.shutterButton.centerX = _screenWidth/2;
+    self.shutterButton.bottom = _screenHeight - 34;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -272,12 +272,12 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     [_switchCameraButton addTarget:self action:@selector(switchCameraButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
     
     if (@available(iOS 11.0, *)) {
-        _switchCameraButton.heee_top = [UIApplication sharedApplication].keyWindow.safeAreaInsets.top;
+        _switchCameraButton.top = [UIApplication sharedApplication].keyWindow.safeAreaInsets.top;
     }else{
-        _switchCameraButton.heee_top = 10;
+        _switchCameraButton.top = 10;
     }
     
-    _switchCameraButton.heee_right = _screenWidth - 10;
+    _switchCameraButton.right = _screenWidth - 10;
     [_switchCameraButton setImage:[UIImage imageNamed:@"H_前后摄像头切换.png"] forState:(UIControlStateNormal)];
     [_switchCameraButton setImageEdgeInsets:UIEdgeInsetsMake(1, 0, 1, 0)];
     [self.view addSubview:_switchCameraButton];
@@ -286,13 +286,13 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     [_flashButton addTarget:self action:@selector(flashButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
     [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:(UIControlStateNormal)];
     [_flashButton setImageEdgeInsets:UIEdgeInsetsMake(7, 7, 7, 7)];
-    _flashButton.heee_centerY = _switchCameraButton.heee_centerY;
-    _flashButton.heee_right = _switchCameraButton.heee_left - 20;
+    _flashButton.centerY = _switchCameraButton.centerY;
+    _flashButton.right = _switchCameraButton.left - 20;
     [self.view addSubview:_flashButton];
     
     _flashNoticeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 160, 40)];
-    _flashNoticeLabel.heee_top = _flashButton.heee_bottom + 20;
-    _flashNoticeLabel.heee_centerX = _screenWidth/2;
+    _flashNoticeLabel.top = _flashButton.bottom + 20;
+    _flashNoticeLabel.centerX = _screenWidth/2;
     _flashNoticeLabel.alpha = 0;
     _flashNoticeLabel.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
     _flashNoticeLabel.layer.cornerRadius = 8;
@@ -304,15 +304,15 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     UIButton *closeButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 0, 40, 40)];
     [closeButton addTarget:self action:@selector(closeButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
-    closeButton.heee_centerY = _switchCameraButton.heee_centerY;
+    closeButton.centerY = _switchCameraButton.centerY;
     [closeButton setImage:[UIImage imageNamed:@"H_取消_白.png"] forState:(UIControlStateNormal)];
     [closeButton setImageEdgeInsets:UIEdgeInsetsMake(11, 11, 11, 11)];
     [self.view addSubview:closeButton];
     
     _recodeTimeBackView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 40)];
     _recodeTimeBackView.userInteractionEnabled = NO;
-    _recodeTimeBackView.heee_centerY = _switchCameraButton.heee_centerY;
-    _recodeTimeBackView.heee_centerX = (_flashButton.heee_centerX + closeButton.heee_centerX)/2;
+    _recodeTimeBackView.centerY = _switchCameraButton.centerY;
+    _recodeTimeBackView.centerX = (_flashButton.centerX + closeButton.centerX)/2;
     _recodeTimeBackView.alpha = 0;
     _recodeTimeBackView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
     _recodeTimeBackView.layer.cornerRadius = 8;
@@ -321,10 +321,10 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     redView.backgroundColor = [UIColor colorWithRed:242/255.0 green:54/255.0 blue:58/255.0 alpha:1.0];
     redView.layer.cornerRadius = 5;
     redView.clipsToBounds = YES;
-    redView.heee_centerY = 20;
+    redView.centerY = 20;
     [_recodeTimeBackView addSubview:redView];
     
-    _recodeTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(redView.heee_right + 10, 0, 90, 40)];
+    _recodeTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(redView.right + 10, 0, 90, 40)];
     _recodeTimeLabel.textColor = [UIColor whiteColor];
     _recodeTimeLabel.font = [UIFont systemFontOfSize:18 weight:0.3];
     _recodeTimeLabel.text = @"00:00";
@@ -342,9 +342,9 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     [self.view addSubview:self.retakeBackView];
     [self.view addSubview:self.selectBackView];
     [self.view addSubview:self.saveBackView];
-    self.retakeBackView.heee_bottom = _screenHeight - 80;
-    self.saveBackView.heee_bottom = self.retakeBackView.heee_top - 10;
-    self.selectBackView.heee_bottom = self.saveBackView.heee_top - 10;
+    self.retakeBackView.bottom = _screenHeight - 80;
+    self.saveBackView.bottom = self.retakeBackView.top - 10;
+    self.selectBackView.bottom = self.saveBackView.top - 10;
     
     //对焦手势
     _focusGesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(focusGesture:)];
@@ -1295,24 +1295,24 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         _focusView.layer.borderWidth = 2;
         
         UIView *topLittleLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2, length/10)];
-        topLittleLine.heee_centerX = length/2;
+        topLittleLine.centerX = length/2;
         topLittleLine.backgroundColor = [UIColor whiteColor];
         [_focusView addSubview:topLittleLine];
         
         UIView *rightLittleLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, length/10, 2)];
-        rightLittleLine.heee_centerY = length/2;
-        rightLittleLine.heee_right = length;
+        rightLittleLine.centerY = length/2;
+        rightLittleLine.right = length;
         rightLittleLine.backgroundColor = [UIColor whiteColor];
         [_focusView addSubview:rightLittleLine];
         
         UIView *bottomLittleLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2, length/10)];
-        bottomLittleLine.heee_centerX = length/2;
-        bottomLittleLine.heee_bottom = length;
+        bottomLittleLine.centerX = length/2;
+        bottomLittleLine.bottom = length;
         bottomLittleLine.backgroundColor = [UIColor whiteColor];
         [_focusView addSubview:bottomLittleLine];
         
         UIView *leftLittleLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, length/10, 2)];
-        leftLittleLine.heee_centerY = length/2;
+        leftLittleLine.centerY = length/2;
         leftLittleLine.backgroundColor = [UIColor whiteColor];
         [_focusView addSubview:leftLittleLine];
     }

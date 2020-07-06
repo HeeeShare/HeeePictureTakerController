@@ -27,7 +27,7 @@
     backView.layer.cornerRadius = 8;
     backView.layer.masksToBounds = YES;
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.heee_width - 40, 0)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.width - 40, 0)];
     label.numberOfLines = 0;
     label.font = [UIFont systemFontOfSize:18 weight:0.3];
     label.textColor = [UIColor whiteColor];
@@ -35,7 +35,7 @@
     [label sizeToFit];
     
     CGFloat lineSpace = 5;
-    if (label.heee_height < 30) {
+    if (label.height < 30) {
         lineSpace = 0;
     }
     
@@ -47,9 +47,9 @@
     [label sizeToFit];
     
     [backView.contentView addSubview:label];
-    backView.heee_width = fabs(label.heee_width + 20);
-    backView.heee_height = fabs(label.heee_height + 20);
-    label.center = CGPointMake(backView.heee_width/2, backView.heee_height/2);
+    backView.width = fabs(label.width + 20);
+    backView.height = fabs(label.height + 20);
+    label.center = CGPointMake(backView.width/2, backView.height/2);
     [self addSubview:backView];
     
     backView.transform = CGAffineTransformMakeScale(0.4, 0.4);
@@ -61,13 +61,13 @@
     }];
     
     if ([position isEqualToString:@"top"]) {
-        backView.heee_top = 20;
-        backView.heee_centerX = self.heee_width/2;
+        backView.top = 20;
+        backView.centerX = self.width/2;
     }else if ([position isEqualToString:@"bottom"]) {
-        backView.heee_bottom = self.heee_height - 20;
-        backView.heee_centerX = self.heee_width/2;
+        backView.bottom = self.height - 20;
+        backView.centerX = self.width/2;
     }else{
-        backView.center = CGPointMake(self.heee_width/2, self.heee_height/2);
+        backView.center = CGPointMake(self.width/2, self.height/2);
     }
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

@@ -39,19 +39,19 @@
     [effectView.contentView addSubview:label];
     
     if (title.length > 0) {
-        effectView.heee_width = 120;
+        effectView.width = 120;
         label.text = title;
-        indicatorView.heee_top = 15;
-        indicatorView.heee_centerX = effectView.heee_width/2;
-        label.heee_top = indicatorView.heee_bottom + 15;
-        effectView.heee_height = label.heee_bottom + 15;
+        indicatorView.top = 15;
+        indicatorView.centerX = effectView.width/2;
+        label.top = indicatorView.bottom + 15;
+        effectView.height = label.bottom + 15;
     }else{
-        effectView.heee_width = 80;
-        effectView.heee_height = 80;
-        indicatorView.center = CGPointMake(effectView.heee_width/2, effectView.heee_height/2);
+        effectView.width = 80;
+        effectView.height = 80;
+        indicatorView.center = CGPointMake(effectView.width/2, effectView.height/2);
     }
     
-    effectView.center = CGPointMake(self.heee_width/2, self.heee_height/2);
+    effectView.center = CGPointMake(self.width/2, self.height/2);
 }
 
 - (void)hideHUD {
