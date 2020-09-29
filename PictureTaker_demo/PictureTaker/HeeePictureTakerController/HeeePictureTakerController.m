@@ -10,17 +10,11 @@
 #import <Photos/Photos.h>
 #import "HeeePictureTakerAnimateButton.h"
 #import "HeeeAVPlayerController.h"
-#import "UIView+HeeeQuickFrame.h"
 #import "UIView+HeeeHUD.h"
 #import "UIView+HeeeToast.h"
+#import "UIView+HeeeQuickFrame.h"
 
-typedef NS_ENUM(NSInteger,HPFlashMode) {
-    HPFlashModeAuto,
-    HPFlashModeOn,
-    HPFlashModeOff,
-};
-
-@interface HeeePictureTakerController ()<CAAnimationDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface HeeePictureTakerController ()<CAAnimationDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCapturePhotoCaptureDelegate>
 /*相机配置*/
 @property (nonatomic, strong) AVCaptureDevice               *videoDevice;
 @property (nonatomic, strong) AVCaptureSession              *session;
@@ -30,6 +24,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, strong) AVCaptureDeviceInput          *audioInput;
 @property (nonatomic, strong) AVCaptureVideoDataOutput      *videoOutput;
 @property (nonatomic, strong) AVCaptureAudioDataOutput      *audioOutput;
+@property (nonatomic, assign) AVCaptureFlashMode            flashMode;
 
 /*视频写入*/
 @property (nonatomic, strong) dispatch_queue_t              writeQueue;
@@ -51,9 +46,10 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, strong) UIVisualEffectView            *maskView;
 @property (nonatomic, strong) UIView                        *gestureView;//用于添加手势的view
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer    *previewLayer;//用于显示摄像头画面
-@property (nonatomic, strong) AVCaptureStillImageOutput     *imageOutput;//照片输出流
+@property (nonatomic, strong) AVCapturePhotoOutput          *imageOutput;//照片输出流
 @property (nonatomic, strong) UIImage                       *image;//拍照获得的照片
 @property (nonatomic, strong) HeeePictureTakerAnimateButton *shutterButton;//拍照按钮
+@property (nonatomic, strong) UILabel                       *tipLabel;
 @property (nonatomic, strong) UIButton                      *switchCameraButton;//前后摄像头切换
 @property (nonatomic, strong) UIButton                      *flashButton;//闪光灯按钮
 @property (nonatomic, strong) UILabel                       *flashNoticeLabel;//闪光灯切换说明
@@ -66,7 +62,6 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, strong) UITapGestureRecognizer        *focusGesture;//对焦手势
 @property (nonatomic, strong) UIPinchGestureRecognizer      *pinchGesture;//缩放手势
 @property (nonatomic, strong) NSTimer                       *focusViewTimer1,*focusViewTimer2,*flashNoticeLabelTimer,*recodeTimer;//控制控件显示的timer
-@property (nonatomic, assign) HPFlashMode                   flashMode;//0:自动，1:打开，2:关闭
 @property (nonatomic, assign) CGFloat                       initialPinchZoom;
 @property (nonatomic, assign) BOOL                          pictureMode;//没有在录视频的标志
 @property (nonatomic, assign) int                           recodeTime;
@@ -74,6 +69,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 @property (nonatomic, assign) BOOL                          notNeedStopRunning;
 @property (nonatomic, assign) CGFloat                       screenWidth;
 @property (nonatomic, assign) CGFloat                       screenHeight;
+@property (nonatomic, assign) BOOL                          isIphoneX;
 
 @end
 
@@ -117,8 +113,10 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 - (instancetype)initWithTakerMode:(HeeePictureTakerMode)takerMode {
     self = [super init];
     if (self) {
+        _isIphoneX = [UIApplication sharedApplication].statusBarFrame.size.height!=20;
         _takerMode = takerMode;
         _videoQuality = AVCaptureSessionPreset1920x1080;
+        _maxVideoDuration = MAXFLOAT;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
     }
     
@@ -127,7 +125,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor blackColor];
     
     _videoQueue = dispatch_queue_create("com.Heee.video", DISPATCH_QUEUE_SERIAL);
     _audioQueue = dispatch_queue_create("com.Heee.audio", DISPATCH_QUEUE_SERIAL);
@@ -151,12 +149,26 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     _screenWidth = [UIScreen mainScreen].bounds.size.width;
     _screenHeight = [UIScreen mainScreen].bounds.size.height;
     
-    _gestureView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
+    _gestureView = [[UIView alloc] init];
+    _gestureView.clipsToBounds = YES;
     [self.view addSubview:_gestureView];
     
     if ([self checkCameraPermission]) {
         [self configCamera];
         [self addSubViews];
+    }
+    
+    if (self.takerMode == HeeeTakerModePictureAndVideo) {
+        [self.view addSubview:self.tipLabel];
+        [UIView animateWithDuration:0.3 animations:^{
+            self.tipLabel.alpha = 1;
+        }];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.3 animations:^{
+                self.tipLabel.alpha = 0;
+            }];
+        });
     }
 }
 
@@ -165,20 +177,22 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     return[[str componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
     
     _screenWidth = self.view.bounds.size.width;
     _screenHeight = self.view.bounds.size.height;
-    _gestureView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
     _maskView.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
-    _pictureShowIV.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
     self.retakeBackView.bottom = _screenHeight - 80;
     self.saveBackView.bottom = self.retakeBackView.top - 10;
     self.selectBackView.bottom = self.saveBackView.top - 10;
-    self.previewLayer.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
+    _gestureView.frame = CGRectMake(0, (_isIphoneX?(_recodeTimeBackView.bottom + 8):0), _screenWidth, _screenWidth*_outputSize.height/_outputSize.width);
+    self.previewLayer.frame = _gestureView.bounds;
+    _pictureShowIV.frame = _gestureView.frame;
     self.shutterButton.centerX = _screenWidth/2;
-    self.shutterButton.bottom = _screenHeight - 34;
+    self.shutterButton.bottom = _screenHeight - (_isIphoneX?34:0) - 36;
+    self.tipLabel.centerX = self.shutterButton.centerX;
+    self.tipLabel.bottom = self.shutterButton.top - 16;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -211,7 +225,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     if (_isFirstComeIn) {
         if ([self checkCameraPermission]) {
             [self handleFlashNoticeLabel];
-            [self focusAtPoint:CGPointMake(_screenWidth/2, _screenHeight/2)];
+            [self focusAtPoint:CGPointMake(_gestureView.width/2, _gestureView.height/2)];
         }else{
             __weak typeof (self) weakSelf = self;
             UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"提示" message:@"请到【设置】->【隐私】->【相机】中打开相机权限" preferredStyle:(UIAlertControllerStyleAlert)];
@@ -222,7 +236,9 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
             UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"去设置" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction * _Nonnull action) {
                 NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
                 if([[UIApplication sharedApplication] canOpenURL:url]) {
-                    [[UIApplication sharedApplication] openURL:url];
+                    [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:^(BOOL success) {
+                        
+                    }];
                 }
                 
                 [weakSelf closeButtonClickAnimate:YES];
@@ -331,12 +347,12 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     [_recodeTimeBackView addSubview:_recodeTimeLabel];
     [self.view addSubview:_recodeTimeBackView];
     
-    [self.view addSubview:self.focusView];
+    [self.gestureView addSubview:self.focusView];
     
-    _pictureShowIV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
+    _pictureShowIV = [[UIImageView alloc] init];
+    _pictureShowIV.contentMode = UIViewContentModeScaleAspectFill;
     _pictureShowIV.userInteractionEnabled = YES;
     _pictureShowIV.hidden = YES;
-    _pictureShowIV.contentMode = UIViewContentModeScaleAspectFill;
     [self.view addSubview:_pictureShowIV];
     
     [self.view addSubview:self.retakeBackView];
@@ -372,7 +388,8 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     if (_takerMode != HeeeTakerModePicture) {
         //添加语音输入
-        AVCaptureDevice *audioCaptureDevice = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] firstObject];
+        AVCaptureDeviceDiscoverySession *deviceDiscoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInMicrophone] mediaType:AVMediaTypeAudio position:(AVCaptureDevicePositionUnspecified)];
+        AVCaptureDevice *audioCaptureDevice = deviceDiscoverySession.devices.firstObject;
         self.audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioCaptureDevice error:nil];
         if ([self.session canAddInput:self.audioInput]) {
             [self.session addInput:self.audioInput];
@@ -402,7 +419,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     }
     
     //添加图像输出
-    self.imageOutput = [[AVCaptureStillImageOutput alloc] init];
+    self.imageOutput = [[AVCapturePhotoOutput alloc] init];
     if ([self.session canAddOutput:self.imageOutput]) {
         [self.session addOutput:self.imageOutput];
     }
@@ -410,18 +427,27 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     //添加画面显示
     self.previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
-    self.previewLayer.frame = CGRectMake(0, 0, _screenWidth, _screenHeight);
-    self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    [self.view.layer addSublayer:self.previewLayer];
+    self.previewLayer.backgroundColor = [UIColor blackColor].CGColor;
+    self.previewLayer.cornerRadius = 1;
+    self.previewLayer.masksToBounds = YES;
+    [self.gestureView.layer addSublayer:self.previewLayer];
     
     if ([self.videoDevice lockForConfiguration:nil]) {
         //默认自动闪光灯
-        if ([self.videoDevice isFlashModeSupported:AVCaptureFlashModeAuto]) {
-            [self.videoDevice setFlashMode:AVCaptureFlashModeAuto];
-        }
-        
-        [self.videoDevice unlockForConfiguration];
+        [self supportedFlashMode:AVCaptureFlashModeAuto];
     }
+    
+    [self.videoDevice unlockForConfiguration];
+}
+
+- (BOOL)supportedFlashMode:(AVCaptureFlashMode)flashMode {
+    for (NSNumber *num in self.imageOutput.supportedFlashModes) {
+        if (num.intValue == flashMode) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 #pragma mark - action
@@ -440,11 +466,17 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 - (void)setupWriter {
     //视频
     self.videoAssetWriter = [AVAssetWriter assetWriterWithURL:self.temVideoUrl fileType:AVFileTypeMPEG4 error:nil];
-    
-    NSDictionary *videoCompressionSettings = @{AVVideoCodecKey : AVVideoCodecH264,
-                                               AVVideoWidthKey : @(self.outputSize.height),
-                                               AVVideoHeightKey : @(self.outputSize.width), AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill};
-    _assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoCompressionSettings];
+    if (@available(iOS 11.0, *)) {
+        NSDictionary *videoCompressionSettings = @{AVVideoCodecKey : AVVideoCodecTypeH264,
+                                                   AVVideoWidthKey : @(self.outputSize.height),
+                                                   AVVideoHeightKey : @(self.outputSize.width), AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill};
+        _assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoCompressionSettings];
+    } else {
+        NSDictionary *videoCompressionSettings = @{AVVideoCodecKey : AVVideoCodecH264,
+                                                   AVVideoWidthKey : @(self.outputSize.height),
+                                                   AVVideoHeightKey : @(self.outputSize.width), AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill};
+        _assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoCompressionSettings];
+    }
     //expectsMediaDataInRealTime 必须设为yes，需要从capture session 实时获取数据
     _assetWriterVideoInput.expectsMediaDataInRealTime = YES;
     _assetWriterVideoInput.transform = CGAffineTransformMakeRotation(M_PI / 2.0);
@@ -515,7 +547,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 }
 
 - (void)focusAtPoint:(CGPoint)point {
-    CGSize size = self.view.bounds.size;
+    CGSize size = self.gestureView.bounds.size;
     CGPoint focusPoint = CGPointMake(point.y /size.height ,1 - point.x/size.width);
     
     if ([self.videoDevice lockForConfiguration:nil]) {
@@ -556,9 +588,9 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     
     self.flashNoticeLabel.alpha = 0;
     
-    if (_flashMode == HPFlashModeAuto) {
+    if (_flashMode == AVCaptureFlashModeAuto) {
         self.flashNoticeLabel.text = @"闪光灯-自动";
-    }else if (_flashMode == HPFlashModeOn) {
+    }else if (_flashMode == AVCaptureFlashModeOn) {
         self.flashNoticeLabel.text = @"闪光灯-开";
     }else{
         self.flashNoticeLabel.text = @"闪光灯-关";
@@ -591,6 +623,10 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 }
 
 - (void)refreshRecodeTime {
+    if (_recodeTime >= _maxVideoDuration) {
+        [self stopWrite];
+        return;
+    }
     _recodeTime++;
     
     if (_recodeTime < 60) {
@@ -598,8 +634,10 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     }else if (_recodeTime < 60*60) {
         _recodeTimeLabel.text = [NSString stringWithFormat:@"%02d:%02d",_recodeTime/60,_recodeTime%60];
     }else{
-        //最多录制1个小时
-        [self stopWrite];
+        int hour = _recodeTime/3600;
+        int min = (_recodeTime - hour*3600)/60;
+        int sec = _recodeTime%60;
+        _recodeTimeLabel.text = [NSString stringWithFormat:@"%d:%02d:%02d",hour,min,sec];
     }
 }
 
@@ -633,12 +671,12 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     if (_videoDevice.isTorchActive) {
         if ([_videoDevice lockForConfiguration:nil]) {
             [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-            [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
+            [self supportedFlashMode:AVCaptureFlashModeAuto];
             [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
             [_videoDevice unlockForConfiguration];
         }
         
-        _flashMode = HPFlashModeAuto;
+        _flashMode = AVCaptureFlashModeAuto;
     }
     
     if (_recodeTimer) {
@@ -734,22 +772,9 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
             videoConnection.videoMirrored = YES;
         }
         
-        __weak typeof (self) weakSelf = self;
-        [self.imageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-            if (imageDataSampleBuffer == nil) {
-                weakSelf.pictureShowIV.hidden = YES;
-                weakSelf.focusGesture.enabled = YES;
-                weakSelf.pinchGesture.enabled = YES;
-                return;
-            }
-            
-            NSData *imageData =  [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-            weakSelf.image = [UIImage imageWithData:imageData];
-            weakSelf.pictureShowIV.image = weakSelf.image;
-            weakSelf.retakeBackView.hidden = weakSelf.pictureShowIV.hidden;
-            weakSelf.selectBackView.hidden = weakSelf.pictureShowIV.hidden;
-            weakSelf.saveBackView.hidden = weakSelf.pictureShowIV.hidden;
-        }];
+        AVCapturePhotoSettings *photoSettings = [AVCapturePhotoSettings photoSettings];
+        photoSettings.flashMode = _flashMode;
+        [self.imageOutput capturePhotoWithSettings:photoSettings delegate:self];
     }
 }
 
@@ -918,10 +943,6 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 }
 
 - (void)switchCameraButtonClick {
-    //获取摄像头的数量
-    NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
-    //摄像头小于等于1的时候直接返回
-    if (cameraCount <= 1) return;
     AVCaptureDevice *newCamera = nil;
     AVCaptureDeviceInput *newInput = nil;
     //获取当前相机的方向(前还是后)
@@ -976,15 +997,16 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         [self.session commitConfiguration];
     }
     
-    if (_isRecoding || (_takerMode == HeeeTakerModeVideo && _flashMode == HPFlashModeOn)) {
+    if (_isRecoding || (_takerMode == HeeeTakerModeVideo && _flashMode == AVCaptureFlashModeOn)) {
         [self configTorchMode];
     }
     
-    [self focusAtPoint:CGPointMake(_screenWidth/2, _screenHeight/2)];
+    [self focusAtPoint:CGPointMake(_gestureView.width/2, _gestureView.height/2)];
 }
 
 - (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position {
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceDiscoverySession *deviceDiscoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInWideAngleCamera,AVCaptureDeviceTypeBuiltInDualCamera] mediaType:AVMediaTypeVideo position:position];
+    NSArray *devices = deviceDiscoverySession.devices;
     for ( AVCaptureDevice *device in devices )
         if ( device.position == position ) return device;
     return nil;
@@ -1011,19 +1033,16 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
 //拍照时
 - (void)configFlashMode {
     if ([self.videoDevice lockForConfiguration:nil]) {
-        if (_flashMode == HPFlashModeAuto) {
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeAuto]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeAuto];
+        if (_flashMode == AVCaptureFlashModeAuto) {
+            if ([self supportedFlashMode:AVCaptureFlashModeAuto]) {
                 [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
             }
-        }else if (_flashMode == HPFlashModeOn) {
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOn]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeOn];
+        }else if (_flashMode == AVCaptureFlashModeOn) {
+            if ([self supportedFlashMode:AVCaptureFlashModeOn]) {
                 [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
             }
         }else{
-            if ([_videoDevice isFlashModeSupported:AVCaptureFlashModeOff]) {
-                [_videoDevice setFlashMode:AVCaptureFlashModeOff];
+            if ([self supportedFlashMode:AVCaptureFlashModeOff]) {
                 [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_关.png"] forState:UIControlStateNormal];
             }
         }
@@ -1038,7 +1057,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     if ([[self.videoInput device] position] == AVCaptureDevicePositionBack) {
         if ([self.videoDevice lockForConfiguration:nil]) {
             [_videoDevice setTorchMode:AVCaptureTorchModeOff];
-            if (_flashMode == HPFlashModeAuto) {
+            if (_flashMode == AVCaptureFlashModeAuto) {
                 if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeAuto]) {
                     if (!_isFirstComeIn) {
                         [_videoDevice setTorchMode:AVCaptureTorchModeAuto];
@@ -1046,7 +1065,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
                     
                     [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_自动.png"] forState:UIControlStateNormal];
                 }
-            }else if (_flashMode == HPFlashModeOn) {
+            }else if (_flashMode == AVCaptureFlashModeOn) {
                 if ([_videoDevice isTorchModeSupported:AVCaptureTorchModeOn]) {
                     [_videoDevice setTorchMode:AVCaptureTorchModeOn];
                     [_flashButton setImage:[UIImage imageNamed:@"H_闪光灯_开.png"] forState:UIControlStateNormal];
@@ -1089,6 +1108,22 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     if (flag) {
         _focusViewTimer1 = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(focusViewTimer1Action) userInfo:nil repeats:NO];
         _focusViewTimer2 = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(focusViewTimer2Action) userInfo:nil repeats:NO];
+    }
+}
+
+#pragma mark - AVCapturePhotoCaptureDelegate
+- (void)captureOutput:(AVCapturePhotoOutput *)output didFinishProcessingPhoto:(AVCapturePhoto *)photo error:(nullable NSError *)error API_AVAILABLE(ios(11.0)) {
+    NSData *imageData = [photo fileDataRepresentation];
+    if (imageData) {
+        _image = [UIImage imageWithData:imageData];
+        _pictureShowIV.image = _image;
+        _retakeBackView.hidden = _pictureShowIV.hidden;
+        _selectBackView.hidden = _pictureShowIV.hidden;
+        _saveBackView.hidden = _pictureShowIV.hidden;
+    }else{
+        _pictureShowIV.hidden = YES;
+        _focusGesture.enabled = YES;
+        _pinchGesture.enabled = YES;
     }
 }
 
@@ -1293,6 +1328,7 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
         _focusView.alpha = 0;
         _focusView.layer.borderColor = [UIColor whiteColor].CGColor;
         _focusView.layer.borderWidth = 2;
+        _focusView.layer.zPosition = 100;
         
         UIView *topLittleLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2, length/10)];
         topLittleLine.centerX = length/2;
@@ -1318,6 +1354,28 @@ typedef NS_ENUM(NSInteger,HPFlashMode) {
     }
     
     return _focusView;
+}
+
+- (UILabel *)tipLabel {
+    if (!_tipLabel) {
+        _tipLabel = [UILabel new];
+        _tipLabel.alpha = 0;
+        
+        NSString *str = @"点击拍照，长按摄像";
+        NSMutableAttributedString *titleAttStr = [[NSMutableAttributedString alloc] initWithString:str];
+        [titleAttStr addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0,[str length])];
+        [titleAttStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:NSMakeRange(0,[str length])];
+        
+        NSShadow *shadow = [[NSShadow alloc]init];
+        shadow.shadowBlurRadius = 2;
+        shadow.shadowOffset = CGSizeMake(0,0);
+        shadow.shadowColor = [UIColor colorWithWhite:0 alpha:0.5];
+        [titleAttStr addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0,[str length])];
+        _tipLabel.attributedText = titleAttStr;
+        [_tipLabel sizeToFit];
+    }
+    
+    return _tipLabel;
 }
 
 @end

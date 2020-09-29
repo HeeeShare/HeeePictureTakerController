@@ -23,9 +23,9 @@
 		A73DF89D211B31B2000C2F70 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF89C211B31B2000C2F70 /* ViewController.m */; };
 		A73DF8A2211B31B3000C2F70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A73DF8A1211B31B3000C2F70 /* Assets.xcassets */; };
 		A73DF8A8211B31B3000C2F70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8A7211B31B3000C2F70 /* main.m */; };
-		A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */; };
 		A73DF8D9211B4173000C2F70 /* HeeePictureTakerController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CD211B4173000C2F70 /* HeeePictureTakerController.m */; };
 		A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */; };
+		FD61BE6825238874000E00ED /* UIView+HeeeQuickFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = FD61BE6725238874000E00ED /* UIView+HeeeQuickFrame.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,11 +53,11 @@
 		A73DF8A6211B31B3000C2F70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A73DF8A7211B31B3000C2F70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerAnimateButton.h; sourceTree = "<group>"; };
-		A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeQuickFrame.m"; sourceTree = "<group>"; };
 		A73DF8CD211B4173000C2F70 /* HeeePictureTakerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerController.m; sourceTree = "<group>"; };
 		A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeeePictureTakerAnimateButton.m; sourceTree = "<group>"; };
-		A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeQuickFrame.h"; sourceTree = "<group>"; };
 		A73DF8D2211B4173000C2F70 /* HeeePictureTakerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeeePictureTakerController.h; sourceTree = "<group>"; };
+		FD61BE6625238874000E00ED /* UIView+HeeeQuickFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HeeeQuickFrame.h"; sourceTree = "<group>"; };
+		FD61BE6725238874000E00ED /* UIView+HeeeQuickFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HeeeQuickFrame.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,12 +127,12 @@
 				455B990D211C115C00EB5A4B /* HeeeAVPlayerController.m */,
 				A73DF8C8211B4173000C2F70 /* HeeePictureTakerAnimateButton.h */,
 				A73DF8CF211B4173000C2F70 /* HeeePictureTakerAnimateButton.m */,
-				A73DF8D0211B4173000C2F70 /* UIView+HeeeQuickFrame.h */,
-				A73DF8CB211B4173000C2F70 /* UIView+HeeeQuickFrame.m */,
 				A73BFECF21F4551D009246A4 /* UIView+HeeeHUD.h */,
 				A73BFECD21F4551D009246A4 /* UIView+HeeeHUD.m */,
 				A73BFED021F4551E009246A4 /* UIView+HeeeToast.h */,
 				A73BFECE21F4551D009246A4 /* UIView+HeeeToast.m */,
+				FD61BE6625238874000E00ED /* UIView+HeeeQuickFrame.h */,
+				FD61BE6725238874000E00ED /* UIView+HeeeQuickFrame.m */,
 				A7251FE92127C0C4009E770B /* res */,
 			);
 			path = HeeePictureTakerController;
@@ -164,7 +164,7 @@
 		A73DF88D211B31B1000C2F70 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = hgy;
 				TargetAttributes = {
 					A73DF894211B31B2000C2F70 = {
@@ -217,10 +217,10 @@
 			files = (
 				A73DF89D211B31B2000C2F70 /* ViewController.m in Sources */,
 				A73DF8DB211B4173000C2F70 /* HeeePictureTakerAnimateButton.m in Sources */,
-				A73DF8D7211B4173000C2F70 /* UIView+HeeeQuickFrame.m in Sources */,
 				455B990E211C115C00EB5A4B /* HeeeAVPlayerController.m in Sources */,
 				A73DF8D9211B4173000C2F70 /* HeeePictureTakerController.m in Sources */,
 				A73DF8A8211B31B3000C2F70 /* main.m in Sources */,
+				FD61BE6825238874000E00ED /* UIView+HeeeQuickFrame.m in Sources */,
 				A73BFED221F4551E009246A4 /* UIView+HeeeToast.m in Sources */,
 				A73DF89A211B31B2000C2F70 /* AppDelegate.m in Sources */,
 				A73BFED121F4551E009246A4 /* UIView+HeeeHUD.m in Sources */,
@@ -256,6 +256,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -281,7 +282,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -314,6 +315,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -333,7 +335,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -349,7 +351,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 27HH8LNC45;
 				INFOPLIST_FILE = PictureTaker/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -370,7 +372,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 27HH8LNC45;
 				INFOPLIST_FILE = PictureTaker/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

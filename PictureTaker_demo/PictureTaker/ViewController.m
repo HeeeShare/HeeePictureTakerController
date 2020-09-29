@@ -41,6 +41,7 @@
 
 - (void)videoBtnClick {
     HeeePictureTakerController *pictureTakerVC = [[HeeePictureTakerController alloc] initWithTakerMode:HeeeTakerModeVideo];
+    pictureTakerVC.maxVideoDuration = 15;
     [self presentViewController:pictureTakerVC animated:YES completion:nil];
 }
 
@@ -58,5 +59,11 @@
     [btn setTitle:title forState:(UIControlStateNormal)];
     return btn;
 }
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
 
 @end

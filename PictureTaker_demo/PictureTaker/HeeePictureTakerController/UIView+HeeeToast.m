@@ -6,6 +6,8 @@
 //  Copyright © 2018年 hgy. All rights reserved.
 //
 #define toastViewTag 10077
+#define HKStatusBarHeight ([UIApplication sharedApplication].statusBarFrame.size.height)
+#define HKHomeIndecatorHeight ((HKStatusBarHeight==20) ? 0.0 : 44.0)
 
 #import "UIView+HeeeToast.h"
 #import "UIView+HeeeQuickFrame.h"
@@ -20,67 +22,58 @@
         content = @" ";
     }
     
-    UIVisualEffectView *backView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
-    backView.userInteractionEnabled = NO;
-    backView.layer.zPosition = 9999;
-    backView.tag = toastViewTag;
-    backView.layer.cornerRadius = 8;
-    backView.layer.masksToBounds = YES;
+    CGFloat sizeGap = 24;
+    CGFloat titleLeftGap = 20;
+    CGFloat titleTopGap = 10;
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.width - 40, 0)];
+    UIView *toastView = [[UIView alloc] init];
+    toastView.tag = toastViewTag;
+    toastView.userInteractionEnabled = NO;
+    toastView.layer.zPosition = 1000;
+    toastView.layer.masksToBounds = YES;
+    toastView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.5];
+    toastView.layer.cornerRadius = 4;
+    [self addSubview:toastView];
+    toastView.alpha = 0;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width - 2*(sizeGap + titleLeftGap), 0)];
     label.numberOfLines = 0;
-    label.font = [UIFont systemFontOfSize:18 weight:0.3];
+    label.font = [UIFont systemFontOfSize:16 weight:UIFontWeightBold];
     label.textColor = [UIColor whiteColor];
     label.text = content;
     [label sizeToFit];
+    label.frame = CGRectMake(titleLeftGap, titleTopGap, label.bounds.size.width, label.bounds.size.height);
+    [toastView addSubview:label];
     
-    CGFloat lineSpace = 5;
-    if (label.height < 30) {
-        lineSpace = 0;
-    }
-    
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:content];
-    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-    [paragraphStyle setLineSpacing:lineSpace];//设置行间距
-    [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [content length])];
-    [label setAttributedText:attributedString];
-    [label sizeToFit];
-    
-    [backView.contentView addSubview:label];
-    backView.width = fabs(label.width + 20);
-    backView.height = fabs(label.height + 20);
-    label.center = CGPointMake(backView.width/2, backView.height/2);
-    [self addSubview:backView];
-    
-    backView.transform = CGAffineTransformMakeScale(0.4, 0.4);
-    
-    [UIView animateWithDuration:0.6 delay:0 usingSpringWithDamping:0.3 initialSpringVelocity:10 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        backView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    } completion:^(BOOL finished) {
-        
-    }];
-    
+    CGFloat toastViewW = label.bounds.size.width + titleLeftGap*2;
+    CGFloat toastViewH = label.bounds.size.height + titleTopGap*2;
+    CGFloat toastViewX = (self.bounds.size.width - toastViewW)/2;
+    CGFloat toastViewY = (self.bounds.size.height - toastViewH)/2;
     if ([position isEqualToString:@"top"]) {
-        backView.top = 20;
-        backView.centerX = self.width/2;
+        toastViewY = 12 + HKStatusBarHeight;
     }else if ([position isEqualToString:@"bottom"]) {
-        backView.bottom = self.height - 20;
-        backView.centerX = self.width/2;
-    }else{
-        backView.center = CGPointMake(self.width/2, self.height/2);
+        toastViewY = self.bounds.size.height - toastViewH - 12 - HKHomeIndecatorHeight;
     }
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [UIView animateWithDuration:0.25 animations:^{
-                backView.alpha = 0;
+    toastView.frame = CGRectMake(toastViewX, toastViewY, toastViewW, toastViewH);
+    
+    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+    effectView.frame = toastView.bounds;
+    [toastView insertSubview:effectView belowSubview:label];
+    
+    toastView.transform = CGAffineTransformMakeScale(0.9, 0.9);
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        toastView.alpha = 1.0;
+        toastView.transform = CGAffineTransformIdentity;
+    } completion:^(BOOL finished) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.15 animations:^{
+                toastView.alpha = 0;
             } completion:^(BOOL finished) {
-                if (finished) {
-                    [backView removeFromSuperview];
-                }
+                [toastView removeFromSuperview];
             }];
         });
-    });
+    }];
 }
 
 - (void)showToast:(NSString *)content duration:(CGFloat)duration {

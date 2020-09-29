@@ -23,35 +23,40 @@
     clearBackView.backgroundColor = [UIColor clearColor];
     [self addSubview:clearBackView];
     
-    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
-    effectView.layer.cornerRadius = 12;
-    effectView.layer.masksToBounds = YES;
-    [clearBackView addSubview:effectView];
+    UIView *maskView = [[UIView alloc] init];
+    maskView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6];
+    maskView.layer.cornerRadius = 8;
+    maskView.layer.masksToBounds = YES;
+    [clearBackView addSubview:maskView];
+    
+    UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+    [maskView addSubview:blurView];
     
     UIActivityIndicatorView *indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [indicatorView startAnimating];
-    [effectView.contentView addSubview:indicatorView];
+    [maskView addSubview:indicatorView];
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 100, 20)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 80, 20)];
     label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:16 weight:0.3];
+    label.font = [UIFont systemFontOfSize:15 weight:UIFontWeightMedium];
     label.textColor = [UIColor whiteColor];
-    [effectView.contentView addSubview:label];
+    [maskView addSubview:label];
     
     if (title.length > 0) {
-        effectView.width = 120;
+        maskView.width = 100;
         label.text = title;
         indicatorView.top = 15;
-        indicatorView.centerX = effectView.width/2;
+        indicatorView.centerX = maskView.width/2;
         label.top = indicatorView.bottom + 15;
-        effectView.height = label.bottom + 15;
+        maskView.height = label.bottom + 15;
     }else{
-        effectView.width = 80;
-        effectView.height = 80;
-        indicatorView.center = CGPointMake(effectView.width/2, effectView.height/2);
+        maskView.width = 64;
+        maskView.height = 64;
+        indicatorView.center = CGPointMake(maskView.width/2, maskView.height/2);
     }
     
-    effectView.center = CGPointMake(self.width/2, self.height/2);
+    maskView.center = CGPointMake(self.width/2, self.height/2);
+    blurView.frame = maskView.bounds;
 }
 
 - (void)hideHUD {

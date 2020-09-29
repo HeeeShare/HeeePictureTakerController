@@ -6,12 +6,12 @@
 //  Copyright © 2018年 hgy. All rights reserved.
 //
 
-#define H_buttonWidth 68.0
-#define H_lineWidth 6.0
-#define H_gap 2.0
+#define H_buttonWidth 72.0
+#define H_lineWidth 4.0
+#define H_gap 2.5
 #define H_noStartWidth (H_buttonWidth - 2*H_lineWidth - 2*H_gap)
 #define H_startWidth H_noStartWidth/2
-#define H_startCornerRadius 4
+#define H_startCornerRadius 6
 
 #import "HeeePictureTakerAnimateButton.h"
 
