@@ -186,7 +186,7 @@
     self.retakeBackView.bottom = _screenHeight - 80;
     self.saveBackView.bottom = self.retakeBackView.top - 10;
     self.selectBackView.bottom = self.saveBackView.top - 10;
-    _gestureView.frame = CGRectMake(0, (_isIphoneX?(_recodeTimeBackView.bottom + 8):0), _screenWidth, _screenWidth*_outputSize.height/_outputSize.width);
+    _gestureView.frame = CGRectMake(0, (_isIphoneX?(_recodeTimeBackView.bottom + 16):0), _screenWidth, _screenWidth*_outputSize.height/_outputSize.width);
     self.previewLayer.frame = _gestureView.bounds;
     _pictureShowIV.frame = _gestureView.frame;
     self.shutterButton.centerX = _screenWidth/2;
@@ -286,9 +286,8 @@
     
     _switchCameraButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
     [_switchCameraButton addTarget:self action:@selector(switchCameraButtonClick) forControlEvents:(UIControlEventTouchUpInside)];
-    
-    if (@available(iOS 11.0, *)) {
-        _switchCameraButton.top = [UIApplication sharedApplication].keyWindow.safeAreaInsets.top;
+    if (_isIphoneX) {
+        _switchCameraButton.top = 30;
     }else{
         _switchCameraButton.top = 10;
     }
