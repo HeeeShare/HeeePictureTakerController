@@ -190,7 +190,7 @@
     self.previewLayer.frame = _gestureView.bounds;
     _pictureShowIV.frame = _gestureView.frame;
     self.shutterButton.centerX = _screenWidth/2;
-    self.shutterButton.bottom = _screenHeight - (_isIphoneX?34:0) - 36;
+    self.shutterButton.bottom = _gestureView.bottom - 16;
     self.tipLabel.centerX = self.shutterButton.centerX;
     self.tipLabel.bottom = self.shutterButton.top - 16;
 }
